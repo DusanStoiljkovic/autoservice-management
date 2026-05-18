@@ -4,6 +4,7 @@ import {
   Index,
   OneToMany,
   PrimaryGeneratedColumn,
+  DeleteDateColumn
 } from "typeorm";
 import { RepairOrders } from "./RepairOrders";
 
@@ -55,6 +56,13 @@ export class Users {
     default: () => "CURRENT_TIMESTAMP",
   })
   updatedAt: Date;
+
+  @DeleteDateColumn({
+    name: "deleted_at",
+    type: "datetime",
+    nullable: true,
+  })
+  deletedAt: Date | null;
 
   @OneToMany(() => RepairOrders, (repairOrders) => repairOrders.mechanic)
   repairOrders: RepairOrders[];

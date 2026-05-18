@@ -91,14 +91,14 @@ export class RepairOrders {
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "appointment_id", referencedColumnName: "id" }])
-  appointment: Appointments;
+  appointment: Relation<Appointments>;
 
   @ManyToOne(() => Customers, (customers) => customers.repairOrders, {
     onDelete: "RESTRICT",
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "customer_id", referencedColumnName: "id" }])
-  customer: Customers;
+  customer: Relation<Customers>;
 
   @ManyToOne(() => Users, (users) => users.repairOrders, {
     onDelete: "SET NULL",
