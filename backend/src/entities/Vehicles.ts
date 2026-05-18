@@ -10,9 +10,12 @@ import {
 import { Appointments } from "./Appointments";
 import { RepairOrders } from "./RepairOrders";
 import { Customers } from "./Customers";
+import type { Relation } from "typeorm";
 
-@Index("fk_vehicles_customer", ["customerId"], {})
-@Index("licence_plate", ["licencePlate"], { unique: true })
+
+@Index("idx_vehicles_customer_id", ["customerId"], {})
+@Index("idx_vehicles_license_plate", ["licensePlate"], {})
+@Index("license_plate", ["licensePlate"], { unique: true })
 @Index("vin", ["vin"], { unique: true })
 @Entity("vehicles", { schema: "auto_service_management" })
 export class Vehicles {
@@ -28,13 +31,16 @@ export class Vehicles {
   @Column("varchar", { name: "model", length: 100 })
   model: string;
 
+  @Column("int", { name: "production_year", nullable: true })
+  productionYear: number | null;
+
   @Column("varchar", {
-    name: "licence_plate",
+    name: "license_plate",
     nullable: true,
     unique: true,
     length: 30,
   })
-  licencePlate: string | null;
+  licensePlate: string | null;
 
   @Column("varchar", { name: "vin", nullable: true, unique: true, length: 50 })
   vin: string | null;
@@ -65,5 +71,5 @@ export class Vehicles {
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "customer_id", referencedColumnName: "id" }])
-  customer: Customers;
+  customer: Relation<Customers>;
 }

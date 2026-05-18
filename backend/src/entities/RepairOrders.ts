@@ -4,18 +4,31 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { Invoices } from "./Invoices";
+import { RepairOrderItems } from "./RepairOrderItems";
 import { Appointments } from "./Appointments";
 import { Customers } from "./Customers";
 import { Users } from "./Users";
 import { Vehicles } from "./Vehicles";
+import type { Relation } from "typeorm";
+
+export enum RepairOrderStatus {
+  OPEN = "OPEN",
+  IN_PROGRESS = "IN_PROGRESS", 
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED"
+}
 
 @Index("appointment_id", ["appointmentId"], { unique: true })
-@Index("fk_repair_orders_customer", ["customerId"], {})
-@Index("fk_repair_orders_mechanic", ["mechanicId"], {})
-@Index("fk_repair_orders_vehicle", ["vehicleId"], {})
+@Index("idx_repair_orders_appointment_id", ["appointmentId"], {})
+@Index("idx_repair_orders_customer_id", ["customerId"], {})
+@Index("idx_repair_orders_mechanic_id", ["mechanicId"], {})
+@Index("idx_repair_orders_status", ["status"], {})
+@Index("idx_repair_orders_vehicle_id", ["vehicleId"], {})
 @Entity("repair_orders", { schema: "auto_service_management" })
 export class RepairOrders {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
@@ -35,10 +48,10 @@ export class RepairOrders {
 
   @Column("enum", {
     name: "status",
-    enum: ["OPEN", "IN_PROGRESS", "COMPLETED", "CANCELLED"],
-    default: () => "'OPEN'",
+    enum: RepairOrderStatus,
+    default: RepairOrderStatus.OPEN,
   })
-  status: "OPEN" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+  status!: RepairOrderStatus;
 
   @Column("text", { name: "problem_description" })
   problemDescription: string;
@@ -64,6 +77,15 @@ export class RepairOrders {
   })
   updatedAt: Date;
 
+  @OneToOne(() => Invoices, (invoices) => invoices.repairOrder)
+  invoices: Invoices;
+
+  @OneToMany(
+    () => RepairOrderItems,
+    (repairOrderItems) => repairOrderItems.repairOrder
+  )
+  repairOrderItems: RepairOrderItems[];
+
   @OneToOne(() => Appointments, (appointments) => appointments.repairOrders, {
     onDelete: "SET NULL",
     onUpdate: "CASCADE",
@@ -83,7 +105,7 @@ export class RepairOrders {
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "mechanic_id", referencedColumnName: "id" }])
-  mechanic: Users;
+  mechanic: Relation<Users>;
 
   @ManyToOne(() => Vehicles, (vehicles) => vehicles.repairOrders, {
     onDelete: "RESTRICT",

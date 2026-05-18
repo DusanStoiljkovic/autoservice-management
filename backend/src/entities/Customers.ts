@@ -1,17 +1,25 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { Appointments } from "./Appointments";
 import { RepairOrders } from "./RepairOrders";
 import { Vehicles } from "./Vehicles";
 
+@Index("idx_customers_email", ["email"], {})
+@Index("idx_customers_phone", ["phone"], {})
 @Entity("customers", { schema: "auto_service_management" })
 export class Customers {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
   id: number;
 
-  @Column("varchar", { name: "first_name", length: 255 })
+  @Column("varchar", { name: "first_name", length: 100 })
   firstName: string;
 
-  @Column("varchar", { name: "last_name", length: 255 })
+  @Column("varchar", { name: "last_name", length: 100 })
   lastName: string;
 
   @Column("varchar", { name: "phone", length: 30 })

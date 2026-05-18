@@ -7,26 +7,42 @@ import {
 } from "typeorm";
 import { RepairOrders } from "./RepairOrders";
 
-@Index("email_UNIQUE", ["email"], { unique: true })
+export enum UsersRole {
+  ADMIN = "ADMIN",
+  MAGANER = "MANAGER",
+  MECHANIC = "MECHANIC",
+  RECEPTIONIST = "RECEPTIONIST"
+}
+
+@Index("email", ["email"], { unique: true })
+@Index("idx_users_is_active", ["isActive"], {})
+@Index("idx_users_role", ["role"], {})
 @Entity("users", { schema: "auto_service_management" })
 export class Users {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
   id: number;
 
-  @Column("varchar", { name: "first_name", length: 45 })
+  @Column("varchar", { name: "first_name", length: 100 })
   firstName: string;
 
-  @Column("varchar", { name: "last_name", length: 45 })
+  @Column("varchar", { name: "last_name", length: 100 })
   lastName: string;
 
-  @Column("varchar", { name: "email", unique: true, length: 45 })
+  @Column("varchar", { name: "email", unique: true, length: 150 })
   email: string;
 
-  @Column("varchar", { name: "password", length: 45 })
-  password: string;
+  @Column("varchar", { name: "password_hash", length: 255 })
+  passwordHash: string;
 
-  @Column("int", { name: "email_code", nullable: true })
-  emailCode: number | null;
+  @Column("enum", {
+    name: "role",
+    enum: UsersRole,
+    default: UsersRole.RECEPTIONIST,
+  })
+  role!: UsersRole;
+
+  @Column("tinyint", { name: "is_active", width: 1, default: () => "'1'" })
+  isActive: boolean;
 
   @Column("datetime", {
     name: "created_at",
@@ -34,14 +50,11 @@ export class Users {
   })
   createdAt: Date;
 
-  @Column("datetime", { name: "verified_at", nullable: true })
-  verifiedAt: Date | null;
-
-  @Column("datetime", { name: "deleted_at", nullable: true })
-  deletedAt: Date | null;
-
-  @Column("tinyint", { name: "is_active", nullable: true })
-  isActive: number | null;
+  @Column("datetime", {
+    name: "updated_at",
+    default: () => "CURRENT_TIMESTAMP",
+  })
+  updatedAt: Date;
 
   @OneToMany(() => RepairOrders, (repairOrders) => repairOrders.mechanic)
   repairOrders: RepairOrders[];

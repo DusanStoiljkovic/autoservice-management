@@ -1,5 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { RepairOrderItems } from "./RepairOrderItems";
 
+@Index("idx_services_is_active", ["isActive"], {})
 @Entity("services", { schema: "auto_service_management" })
 export class Services {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
@@ -36,4 +44,10 @@ export class Services {
     default: () => "CURRENT_TIMESTAMP",
   })
   updatedAt: Date;
+
+  @OneToMany(
+    () => RepairOrderItems,
+    (repairOrderItems) => repairOrderItems.service
+  )
+  repairOrderItems: RepairOrderItems[];
 }

@@ -10,9 +10,19 @@ import {
 import { Customers } from "./Customers";
 import { Vehicles } from "./Vehicles";
 import { RepairOrders } from "./RepairOrders";
+import type { Relation } from "typeorm";
 
-@Index("fk_appointments_customer", ["customerId"], {})
-@Index("fk_appointments_vehicle", ["vehicleId"], {})
+export enum AppointmentStatus {
+  SCHEDULED = "SCHEDULED",
+  CONFIRMED = "CONFIRMED",
+  CANCELLED = "CANCELLED",
+  COMPLETED = "COMPLETED"
+}
+
+@Index("idx_appointments_customer_id", ["customerId"], {})
+@Index("idx_appointments_scheduled_at", ["scheduledAt"], {})
+@Index("idx_appointments_status", ["status"], {})
+@Index("idx_appointments_vehicle_id", ["vehicleId"], {})
 @Entity("appointments", { schema: "auto_service_management" })
 export class Appointments {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
@@ -29,10 +39,10 @@ export class Appointments {
 
   @Column("enum", {
     name: "status",
-    enum: ["SCHEDULED", "CONFIRMED", "CANCELLED", "COMPLETED"],
-    default: () => "'SCHEDULED'",
+    enum: AppointmentStatus,
+    default: AppointmentStatus.SCHEDULED
   })
-  status: "SCHEDULED" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
+  status!: AppointmentStatus
 
   @Column("text", { name: "description", nullable: true })
   description: string | null;
@@ -64,5 +74,5 @@ export class Appointments {
   vehicle: Vehicles;
 
   @OneToOne(() => RepairOrders, (repairOrders) => repairOrders.appointment)
-  repairOrders: RepairOrders;
+  repairOrders: Relation<RepairOrders>;
 }
