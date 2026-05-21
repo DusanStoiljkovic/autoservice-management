@@ -1,3 +1,4 @@
+import Create from '@/views/customers/appointments/Create.vue'
 import CreateCustomerView from '@/views/customers/CreateCustomerView.vue'
 import CustomerDetailsView from '@/views/customers/CustomerDetailsView.vue'
 import CustomersView from '@/views/customers/CustomersView.vue'
@@ -13,6 +14,11 @@ const router = createRouter({
       path: '/',
       name: 'landing-page',
       component: LandingPage
+    },
+    {
+      path: '/customers/appointments/create',
+      name: 'create-appointment',
+      component: Create
     },
     {
       path: '/customers',
