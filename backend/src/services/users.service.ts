@@ -30,7 +30,7 @@ export class UserService {
             firstName: obj.firstName,
             lastName: obj.lastName,
             email: obj.email,
-            passwordHash: obj.hashed,
+            passwordHash: hashed,
             emailCode: code,
             createdAt: new Date(),
         })
@@ -159,6 +159,10 @@ export class UserService {
                 }
             }
         })
+    }
+
+    static async getUsers() {
+        return await repo.find()
     }
 
 }

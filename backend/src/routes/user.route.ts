@@ -4,6 +4,12 @@ import { UserService } from '../services/users.service'
 
 export const UserRoute = Router()
 
+UserRoute.get('/all', async (req, res) => {
+    await defineRequest(res, async () => {
+        return await UserService.getUsers()
+    })
+})
+
 UserRoute.get('/profile', async (req: any, res) => {
     await defineRequest(res, async () => {
         const email = req.user.email

@@ -35,7 +35,7 @@ export class Users {
   @Column("varchar", { name: "password_hash", length: 255 })
   passwordHash: string;
 
-  @Column("number",{ name: "email_code"})
+  @Column("int",{ name: "email_code"})
   emailCode: number
 
   @Column("enum", {
