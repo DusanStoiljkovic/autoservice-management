@@ -1,6 +1,5 @@
 import { Router } from 'express'
-import { defineRequest, writeJSON } from '../utils'
-import { UserController } from '../modules/users/users.controller'
+import { defineRequest } from '../utils'
 import { UserService } from '../services/users.service'
 
 export const UserRoute = Router()

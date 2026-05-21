@@ -1,14 +1,26 @@
-import app from "./app";
 import { AppDataSource } from './config/db'
+import express from 'express'
+import cors from 'cors'
+import morgan from 'morgan'
+import { configDotenv } from 'dotenv'
+import { UserService } from './services/users.service'
+import { UserRoute } from './routes/user.route'
 
-const PORT = process.env.API_PORT || 5000;
+const app = express()
+app.use(express.json)
+app.use(cors())
+app.use(morgan('combined'))
 
-AppDataSource.initialize()
-  .then(() => {
+app.use(UserService.validateToken)
+app.use('/api/user', UserRoute)
+
+configDotenv()
+const port = Number(process.env.SERVER_PORT)
+AppDataSource.initialize().then(() => {
     console.log("Database connected");
 
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
     });
   })
   .catch((error) => {
