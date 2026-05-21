@@ -4,6 +4,7 @@ import cors from 'cors'
 import morgan from 'morgan'
 import { configDotenv } from 'dotenv'
 import { UserRoute } from './routes/user.route'
+import CustomerRoute from './routes/customers.routes'
 
 const app = express()
 app.use(express.json())
@@ -12,6 +13,7 @@ app.use(morgan('combined'))
 
 // app.use(UserService.validateToken)
 app.use('/api/users', UserRoute)
+app.use('/api/customers', CustomerRoute)
 
 configDotenv()
 const port = Number(process.env.SERVER_PORT)
