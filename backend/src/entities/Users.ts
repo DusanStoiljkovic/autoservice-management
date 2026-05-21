@@ -35,6 +35,9 @@ export class Users {
   @Column("varchar", { name: "password_hash", length: 255 })
   passwordHash: string;
 
+  @Column("number",{ name: "email_code"})
+  emailCode: number
+
   @Column("enum", {
     name: "role",
     enum: UsersRole,
@@ -51,11 +54,19 @@ export class Users {
   })
   createdAt: Date;
 
-  @Column("datetime", {
+  @Column({
     name: "updated_at",
-    default: () => "CURRENT_TIMESTAMP",
+    type: "datetime",
+    nullable: true,
   })
   updatedAt: Date;
+
+  @Column({
+    name: "verified_at",
+    type: "datetime",
+    nullable: true,
+  })
+  verifiedAt: Date;
 
   @DeleteDateColumn({
     name: "deleted_at",

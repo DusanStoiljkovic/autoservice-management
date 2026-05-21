@@ -1,4 +1,9 @@
-import type { Response } from "express"
+import type { Response, Request } from "express"
+
+export function generateVerificationCode() {
+    const num = Math.floor(Math.random() * 100000)
+    return Number(String(num).padStart(6, '0')) 
+}
 
 export async function defineRequest(res: Response, callback: Function) {
     try {
@@ -7,19 +12,39 @@ export async function defineRequest(res: Response, callback: Function) {
             res.status(204).send()
             return
         }
-
         res.json(data)
-    } catch (e: any) {
-        const code = e.message == 'NOT_FOUND' ? 404 : 500
+    } catch (error: any) {
+        const code = error.message == 'NOT_FOUND' ? 404 : 500
         res.status(code).json({
-            message: e.message ?? 'SERVER_ERROR',
+            message: error.message ?? 'SERVER_ERROR',
             timestamp: new Date(),
         })
-        console.log(e)
+        console.log(error)
     }
 }
 
-export function generateVerificationCode() {
-    const num = Math.floor(Math.random() * 100000)
-    return Number(String(num).padStart(6, '0')) 
-}
+// export async function writeJSON<T>(
+//     res: Response, 
+//     callback: (...args: any[]) => Promise<T> | T,
+//     ...args: any[]
+// ) {
+//     try {
+//         const data = await callback(...args)
+
+//         return res.status(200).json({
+//             success: true,
+//             data
+//         })
+//     } catch (error: any) {
+//         console.log("API ERROR: ", error)
+
+//         return res.status(500).json({
+//             success: false,
+//             message: error.message || "Failed to load"
+//         })
+//     }
+// }
+
+// export function parseParam(req: Request, param: string) {
+//     return req.params[param]
+// }
