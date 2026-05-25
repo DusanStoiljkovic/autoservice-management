@@ -5,7 +5,6 @@ import cors from 'cors'
 import morgan from 'morgan'
 
 import { configDotenv } from 'dotenv'
-import { UserRoute } from './routes/user.route'
 import CustomerRoute from './routes/customers.routes'
 import { VehicleRoute } from './routes/vehicle.route'
 import { AppointmentRoute } from './routes/appointments.routes'
@@ -29,7 +28,6 @@ app.get('/api/health', (req, res) => {
 
 // app.use(UserService.validateToken)
 app.use('/api/auth', AuthRoute)
-app.use('/api/users', UserRoute)
 app.use('/api/customers', CustomerRoute)
 app.use('/api/vehicles', VehicleRoute)
 app.use('/api/appointments', AppointmentRoute)
