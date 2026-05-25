@@ -16,7 +16,6 @@ export enum UsersRole {
 }
 
 @Index("email", ["email"], { unique: true })
-@Index("idx_users_is_active", ["isActive"], {})
 @Index("idx_users_role", ["role"], {})
 @Entity("users", { schema: "auto_service_management" })
 export class Users {
@@ -44,9 +43,6 @@ export class Users {
     default: UsersRole.RECEPTIONIST,
   })
   role!: UsersRole;
-
-  @Column("tinyint", { name: "is_active", width: 1, default: () => "'1'" })
-  isActive: boolean;
 
   @Column("datetime", {
     name: "created_at",

@@ -12,6 +12,7 @@ import { AppointmentRoute } from './routes/appointments.routes'
 import ServiceRoute from './routes/services.routes'
 import OrderRoute  from './routes/repair-orders.routes'
 import InvoiceRoute from './routes/invoices.routes'
+import AuthRoute from './routes/auth.routes'
 
 const app = express()
 app.use(express.json())
@@ -27,7 +28,7 @@ app.get('/api/health', (req, res) => {
 })
 
 // app.use(UserService.validateToken)
-// app.use('/api/auth, AuthRoute)
+app.use('/api/auth', AuthRoute)
 app.use('/api/users', UserRoute)
 app.use('/api/customers', CustomerRoute)
 app.use('/api/vehicles', VehicleRoute)
