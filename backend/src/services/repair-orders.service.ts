@@ -1,11 +1,13 @@
 import { AppDataSource } from "../config/db"
 import { RepairOrders } from "../entities/RepairOrders"
 
-const repo = AppDataSource.getRepository(RepairOrders)
-
 export class OrderService {
+  private static get repo() {
+    return AppDataSource.getRepository(RepairOrders)
+  }
+
   static async getAll() {
-    return await repo.find({
+    return await this.repo.find({
       order: {
         id: "ASC",
       },
@@ -13,21 +15,21 @@ export class OrderService {
   }
 
   static async getById(id: number) {
-    const order = await repo.findOne({
+    const order = await this.repo.findOne({
       where: { id },
     })
 
     if (!order) {
-      throw new Error(`Order with id ${id} was not found.`)
+      throw new Error(`Repair order with id ${id} was not found.`)
     }
 
     return order
   }
 
   static async create(orderData: Partial<RepairOrders>) {
-    const order = repo.create(orderData)
+    const order = this.repo.create(orderData)
 
-    return await repo.save(order)
+    return await this.repo.save(order)
   }
 
   static async edit(id: number, orderData: Partial<RepairOrders>) {
@@ -35,16 +37,16 @@ export class OrderService {
 
     Object.assign(order, orderData)
 
-    return await repo.save(order)
+    return await this.repo.save(order)
   }
 
   static async delete(id: number) {
     const order = await this.getById(id)
 
-    await repo.remove(order)
+    await this.repo.remove(order)
 
     return {
-      message: `Order with id ${id} was deleted successfully.`,
+      message: `Repair order with id ${id} was deleted successfully.`,
     }
   }
 }

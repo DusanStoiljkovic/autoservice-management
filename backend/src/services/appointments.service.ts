@@ -2,28 +2,14 @@ import { In } from "typeorm"
 import { AppDataSource } from "../config/db"
 import { Appointments, AppointmentStatus } from "../entities/Appointments"
 import type { CreateAppointmentDto } from "../dto/AppointmentsDto"
-const repo = AppDataSource.getRepository(Appointments)
-
 
 export class AppointmentService {
+  private static get repo() {
+    return AppDataSource.getRepository(Appointments)
+  }
+
   static async getAll() {
-    return await repo.find({
-      select: {
-        id: true,
-        customerId: true,
-        vehicleId: true,
-        scheduledAt: true,
-        status: true,
-        description: true,
-        repairOrders: {
-          id: true,
-          status: true,
-          problemDescription: true,
-          diagnosis: true,
-          startedAt: true,
-          completedAt: true,
-        },
-      },
+    return await this.repo.find({
       relations: {
         repairOrders: true,
       },
@@ -33,22 +19,23 @@ export class AppointmentService {
     })
   }
 
-  static async getByCustomerId(customerId: number) {
-    return await repo.find({
-      select: {
-        id: true,
-        scheduledAt: true,
-        status: true,
-        description: true,
-        repairOrders: {
-          id: true,
-          status: true,
-          problemDescription: true,
-          diagnosis: true,
-          startedAt: true,
-          completedAt: true,
-        },
+  static async getById(id: number) {
+    const appointment = await this.repo.findOne({
+      where: { id },
+      relations: {
+        repairOrders: true,
       },
+    })
+
+    if (!appointment) {
+      throw new Error(`Appointment with id ${id} was not found.`)
+    }
+
+    return appointment
+  }
+
+  static async getByCustomerId(customerId: number) {
+    return await this.repo.find({
       where: {
         customerId,
       },
@@ -65,21 +52,24 @@ export class AppointmentService {
     const scheduledAt = new Date(dto.scheduledAt)
 
     if (Number.isNaN(scheduledAt.getTime())) {
-      throw new Error("INVALID_APPOINTMENT_DATE")
+      throw new Error("Invalid appointment date.")
     }
 
-    const isTaken = await repo.exists({
+    const existingAppointment = await this.repo.findOne({
       where: {
         scheduledAt,
-        status: In(["SCHEDULED", "CONFIRMED"]),
+        status: In([
+          AppointmentStatus.SCHEDULED,
+          AppointmentStatus.CONFIRMED,
+        ]),
       },
     })
 
-    if (isTaken) {
-      throw new Error("APPOINTMENT_ALREADY_TAKEN")
+    if (existingAppointment) {
+      throw new Error("Appointment term is already taken.")
     }
 
-    const appointment = repo.create({
+    const appointment = this.repo.create({
       customerId: dto.customerId,
       vehicleId: dto.vehicleId,
       scheduledAt,
@@ -87,6 +77,32 @@ export class AppointmentService {
       description: dto.problemDescription ?? dto.description ?? "",
     })
 
-    return await repo.save(appointment)
+    return await this.repo.save(appointment)
+  }
+
+  static async edit(id: number, appointmentData: Partial<Appointments>) {
+    const appointment = await this.getById(id)
+
+    Object.assign(appointment, appointmentData)
+
+    return await this.repo.save(appointment)
+  }
+
+  static async changeStatus(id: number, status: AppointmentStatus) {
+    const appointment = await this.getById(id)
+
+    appointment.status = status
+
+    return await this.repo.save(appointment)
+  }
+
+  static async delete(id: number) {
+    const appointment = await this.getById(id)
+
+    await this.repo.remove(appointment)
+
+    return {
+      message: `Appointment with id ${id} was deleted successfully.`,
+    }
   }
 }
