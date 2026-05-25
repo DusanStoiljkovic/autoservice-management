@@ -1,5 +1,5 @@
 import { Router } from "express"
 
-const router = Router()
+const OrderRoute = Router()
 
-export default router
+export default OrderRoute
