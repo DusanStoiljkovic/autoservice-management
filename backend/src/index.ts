@@ -6,13 +6,14 @@ import morgan from 'morgan'
 
 import { configDotenv } from 'dotenv'
 import CustomerRoute from './routes/customers.routes'
-import { VehicleRoute } from './routes/vehicle.route'
+import { VehicleRoute } from './routes/vehicle.routes'
 import { AppointmentRoute } from './routes/appointments.routes'
 import ServiceRoute from './routes/services.routes'
 import OrderRoute  from './routes/repair-orders.routes'
 import InvoiceRoute from './routes/invoices.routes'
 import AuthRoute from './routes/auth.routes'
 import RepairOrderItemsRoute from './routes/repair-order-items.routes'
+import { UserRoute } from './routes/users.routes'
 
 const app = express()
 app.use(express.json())
@@ -28,6 +29,7 @@ app.get('/api/health', (req, res) => {
 })
 
 app.use('/api/auth', AuthRoute)
+app.use("/api/users", UserRoute)
 app.use('/api/customers', CustomerRoute)
 app.use('/api/vehicles', VehicleRoute)
 app.use('/api/appointments', AppointmentRoute)
