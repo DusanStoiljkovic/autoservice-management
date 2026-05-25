@@ -1,5 +1,7 @@
 import { Router } from "express"
 
-const router = Router()
+const ServiceRoute = Router()
 
-export default router
+ServiceRoute.get('/all')
+
+export default ServiceRoute
