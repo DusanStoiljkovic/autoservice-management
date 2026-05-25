@@ -9,8 +9,8 @@ import { UserRoute } from './routes/user.route'
 import CustomerRoute from './routes/customers.routes'
 import { VehicleRoute } from './routes/vehicle.route'
 import { AppointmentRoute } from './routes/appointments.routes'
-import { Timestamp } from 'typeorm'
 import ServiceRoute from './routes/services.routes'
+import OrderRoute  from './routes/repair-orders.routes'
 
 const app = express()
 app.use(express.json())
