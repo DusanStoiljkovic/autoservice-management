@@ -11,6 +11,7 @@ import { VehicleRoute } from './routes/vehicle.route'
 import { AppointmentRoute } from './routes/appointments.routes'
 import ServiceRoute from './routes/services.routes'
 import OrderRoute  from './routes/repair-orders.routes'
+import InvoiceRoute from './routes/invoices.routes'
 
 const app = express()
 app.use(express.json())
@@ -33,7 +34,7 @@ app.use('/api/vehicles', VehicleRoute)
 app.use('/api/appointments', AppointmentRoute)
 app.use('/api/services', ServiceRoute)
 app.use('/api/repair-orders', OrderRoute)
-// app.use('/api/invoices', InvoiceRoute)
+app.use('/api/invoices', InvoiceRoute)
 
 
 configDotenv()
