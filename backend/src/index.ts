@@ -5,7 +5,8 @@ import morgan from 'morgan'
 import { configDotenv } from 'dotenv'
 import { UserRoute } from './routes/user.route'
 import CustomerRoute from './routes/customers.routes'
-
+import { VehicleRoute } from './routes/vehicle.route'
+import { AppointmentRoute } from './routes/appointments.routes'
 const app = express()
 app.use(express.json())
 app.use(cors())
@@ -14,6 +15,8 @@ app.use(morgan('combined'))
 // app.use(UserService.validateToken)
 app.use('/api/users', UserRoute)
 app.use('/api/customers', CustomerRoute)
+app.use('/api/vehicles', VehicleRoute)
+app.use('/api/appointments', AppointmentRoute)
 
 configDotenv()
 const port = Number(process.env.SERVER_PORT)

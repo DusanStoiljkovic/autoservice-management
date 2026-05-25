@@ -1,4 +1,6 @@
 import axios from "axios";
+import { Vehicles } from "../entities/Vehicles";
+import { AppDataSource } from "../config/db";
 
 const client = axios.create({
     baseURL: 'http://localhost:5000/api/v1',
@@ -10,6 +12,8 @@ const client = axios.create({
         return status == 200
     }
 })
+
+const repo = AppDataSource.getRepository(Vehicles)
 
 export class VehicleService {
     static async getBrands() {
@@ -27,5 +31,13 @@ export class VehicleService {
         })
 
         return models.data
+    }
+
+    static async getAll() {
+        return await repo.find()
+    }
+
+    static async create(vehicle: Vehicles) {
+        return await repo.save(vehicle)
     }
 }

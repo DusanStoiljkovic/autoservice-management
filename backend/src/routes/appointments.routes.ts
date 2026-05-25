@@ -1,8 +1,20 @@
-import { Router } from "express"
-import { AppointmentController } from "./appointments.controller"
+import { response, Router } from "express"
+import { request } from "node:http"
+import { defineRequest } from "../utils"
+import { AppointmentService } from "../services/appointments.service"
 
-const router = Router()
+export const AppointmentRoute = Router()
 
-router.get('/', AppointmentController.getAll)
+AppointmentRoute.get('/all', async (request, response) => {
+    await defineRequest(response, async () => {
+        return await AppointmentService.getAll()
+    })
+})
 
-export default router
+AppointmentRoute.post('/create', async (request, response) => {
+    await defineRequest(response, async () => {
+        return await AppointmentService.create(request.body)
+    })
+})
+
+export default AppointmentRoute
