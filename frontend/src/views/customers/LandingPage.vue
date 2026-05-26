@@ -13,21 +13,21 @@
             data-bs-slide-to="0"
             class="active"
             aria-current="true"
-            aria-label="Slide 1"
+            aria-label="Slajd 1"
           ></button>
 
           <button
             type="button"
             data-bs-target="#customerCarousel"
             data-bs-slide-to="1"
-            aria-label="Slide 2"
+            aria-label="Slajd 2"
           ></button>
 
           <button
             type="button"
             data-bs-target="#customerCarousel"
             data-bs-slide-to="2"
-            aria-label="Slide 3"
+            aria-label="Slajd 3"
           ></button>
         </div>
 
@@ -36,19 +36,19 @@
             <div class="container">
               <div class="carousel-caption text-start">
                 <span class="badge text-bg-primary mb-3">
-                  Professional Auto Service
+                  Profesionalni auto servis
                 </span>
 
-                <h1>Book your car service online.</h1>
+                <h1>Zakažite servis automobila online.</h1>
 
                 <p class="opacity-75">
-                  Schedule your repair, maintenance or diagnostics without calling
-                  the workshop.
+                  Zakažite popravku, redovno održavanje ili dijagnostiku bez pozivanja
+                  servisa.
                 </p>
 
                 <p>
                   <RouterLink class="btn btn-lg btn-primary" to="/book-appointment">
-                    Book Appointment
+                    Zakaži termin
                   </RouterLink>
                 </p>
               </div>
@@ -59,19 +59,19 @@
             <div class="container">
               <div class="carousel-caption">
                 <span class="badge text-bg-light mb-3">
-                  Fast & Reliable
+                  Brzo i pouzdano
                 </span>
 
-                <h1>Reliable mechanics for your vehicle.</h1>
+                <h1>Pouzdani majstori za vaše vozilo.</h1>
 
                 <p>
-                  We handle diagnostics, oil changes, brakes, repairs and regular
-                  maintenance.
+                  Radimo dijagnostiku, zamenu ulja, kočnice, popravke i redovno
+                  održavanje vozila.
                 </p>
 
                 <p>
                   <RouterLink class="btn btn-lg btn-primary" to="/services">
-                    View Services
+                    Pogledaj usluge
                   </RouterLink>
                 </p>
               </div>
@@ -82,19 +82,19 @@
             <div class="container">
               <div class="carousel-caption text-end">
                 <span class="badge text-bg-success mb-3">
-                  Transparent Process
+                  Transparentan proces
                 </span>
 
-                <h1>Know what happens with your car.</h1>
+                <h1>Znajte šta se dešava sa vašim automobilom.</h1>
 
                 <p>
-                  From appointment to invoice, your service process is clear and
-                  organized.
+                  Od zakazivanja termina do izdavanja računa, proces servisiranja je
+                  jasan i organizovan.
                 </p>
 
                 <p>
                   <RouterLink class="btn btn-lg btn-primary" to="/login">
-                    Mechanic Login
+                    Prijava za majstora
                   </RouterLink>
                 </p>
               </div>
@@ -109,7 +109,7 @@
           data-bs-slide="prev"
         >
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
+          <span class="visually-hidden">Prethodni</span>
         </button>
 
         <button
@@ -119,7 +119,7 @@
           data-bs-slide="next"
         >
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
+          <span class="visually-hidden">Sledeći</span>
         </button>
       </div>
 
@@ -144,7 +144,7 @@
 
             <p>
               <RouterLink class="btn btn-secondary" to="/services">
-                View details »
+                Pogledaj detalje »
               </RouterLink>
             </p>
           </div>
@@ -155,24 +155,24 @@
         <div class="row featurette align-items-center">
           <div class="col-md-7">
             <h2 class="featurette-heading fw-normal lh-1">
-              Easy appointment booking.
+              Jednostavno zakazivanje termina.
               <span class="text-body-secondary">
-                No phone calls needed.
+                Bez telefonskih poziva.
               </span>
             </h2>
 
             <p class="lead">
-              Customers can request a service appointment online by entering basic
-              vehicle and contact information.
+              Klijenti mogu online da pošalju zahtev za servis unosom osnovnih
+              podataka o vozilu i kontakt informacija.
             </p>
           </div>
 
           <div class="col-md-5">
             <div class="featurette-box">
               <div class="featurette-emoji">📅</div>
-              <h5>Online Scheduling</h5>
+              <h5>Online zakazivanje</h5>
               <p class="text-muted mb-0">
-                Pick the right service and send a request in minutes.
+                Izaberite odgovarajuću uslugu i pošaljite zahtev za nekoliko minuta.
               </p>
             </div>
           </div>
@@ -183,24 +183,24 @@
         <div class="row featurette align-items-center">
           <div class="col-md-7 order-md-2">
             <h2 class="featurette-heading fw-normal lh-1">
-              Clear service information.
+              Jasne informacije o uslugama.
               <span class="text-body-secondary">
-                Before the car enters the garage.
+                Pre nego što vozilo stigne u servis.
               </span>
             </h2>
 
             <p class="lead">
-              Customers can see available services and understand what the auto
-              service offers before booking.
+              Klijenti mogu da vide dostupne usluge i razumeju šta auto servis
+              nudi pre zakazivanja termina.
             </p>
           </div>
 
           <div class="col-md-5 order-md-1">
             <div class="featurette-box">
               <div class="featurette-emoji">🛠️</div>
-              <h5>Service Overview</h5>
+              <h5>Pregled usluga</h5>
               <p class="text-muted mb-0">
-                Oil change, diagnostics, brakes, repairs and more.
+                Zamena ulja, dijagnostika, kočnice, popravke i još mnogo toga.
               </p>
             </div>
           </div>
@@ -211,24 +211,24 @@
         <div class="row featurette align-items-center">
           <div class="col-md-7">
             <h2 class="featurette-heading fw-normal lh-1">
-              Professional repair workflow.
+              Profesionalan tok popravke.
               <span class="text-body-secondary">
-                Built for real workshops.
+                Napravljeno za stvarne auto servise.
               </span>
             </h2>
 
             <p class="lead">
-              The customer-facing landing page connects naturally with the mechanic
-              dashboard for appointments, repair orders and invoices.
+              Customer landing strana se prirodno povezuje sa dashboard-om za
+              majstora, terminima, radnim nalozima i fakturama.
             </p>
           </div>
 
           <div class="col-md-5">
             <div class="featurette-box">
               <div class="featurette-emoji">🚗</div>
-              <h5>Vehicle Service</h5>
+              <h5>Servis vozila</h5>
               <p class="text-muted mb-0">
-                From booking to repair order and final invoice.
+                Od zakazivanja termina do radnog naloga i konačnog računa.
               </p>
             </div>
           </div>
@@ -239,14 +239,14 @@
 
       <footer class="container pb-4">
         <p class="float-end">
-          <a href="#">Back to top</a>
+          <a href="#">Nazad na vrh</a>
         </p>
 
         <p>
           © 2026 AutoService Management ·
-          <a href="#">Privacy</a>
+          <a href="#">Privatnost</a>
           ·
-          <a href="#">Terms</a>
+          <a href="#">Uslovi korišćenja</a>
         </p>
       </footer>
     </main>
@@ -259,31 +259,29 @@ import { RouterLink } from 'vue-router'
 const mainServices = [
   {
     icon: '🛢️',
-    title: 'Oil Change',
+    title: 'Zamena ulja',
     description:
-      'Regular oil and filter replacement to keep your engine healthy and reliable.'
+      'Redovna zamena ulja i filtera za bolji rad motora i duži vek trajanja vozila.'
   },
   {
     icon: '💻',
-    title: 'Diagnostics',
+    title: 'Dijagnostika',
     description:
-      'Computer diagnostics and fault detection for modern vehicles.'
+      'Kompjuterska dijagnostika i očitavanje grešaka kod modernih vozila.'
   },
   {
     icon: '🛞',
-    title: 'Brake Service',
+    title: 'Servis kočnica',
     description:
-      'Brake pads, discs and braking system inspection for safe driving.'
+      'Zamena kočionih pločica, diskova i provera kočionog sistema za bezbednu vožnju.'
   }
 ]
 </script>
 
 <style scoped>
-
 #carousel1 {
     background-image: url('/images/customers/landingHero.jpg');
     background-size: cover;
-    
 }
 
 #carousel2 {

@@ -1,19 +1,19 @@
 <template>
   <main class="book-appointment-page bg-light">
-    <section class="booking-hero text-white">
+    <section id="hero" class="booking-hero text-white">
       <div class="container py-5">
         <div class="row align-items-center min-vh-40">
           <div class="col-lg-8">
             <span class="badge text-bg-primary mb-3">
-              Book Appointment
+              Zakazivanje termina
             </span>
 
             <h1 class="display-5 fw-bold mb-3">
-              Schedule your car service online.
+              Zakažite servis automobila online.
             </h1>
 
             <p class="lead text-white-50 mb-0">
-              Enter your contact details, vehicle information and preferred appointment time.
+              Unesite kontakt podatke, informacije o vozilu i željeni termin dolaska.
             </p>
           </div>
         </div>
@@ -35,7 +35,7 @@
             <div class="card border-0 shadow-sm rounded-4 sticky-summary">
               <div class="card-body p-4">
                 <h4 class="d-flex justify-content-between align-items-center mb-3">
-                  <span class="text-primary">Appointment summary</span>
+                  <span class="text-primary">Pregled termina</span>
                   <span class="badge bg-primary rounded-pill">1</span>
                 </h4>
 
@@ -43,10 +43,10 @@
                   <li class="list-group-item d-flex justify-content-between lh-sm">
                     <div>
                       <h6 class="my-0">
-                        Selected service
+                        Izabrana usluga
                       </h6>
                       <small class="text-body-secondary">
-                        {{ selectedService?.name || 'No service selected' }}
+                        {{ selectedService?.name || 'Nijedna usluga nije izabrana' }}
                       </small>
                     </div>
 
@@ -58,7 +58,7 @@
                   <li class="list-group-item d-flex justify-content-between lh-sm">
                     <div>
                       <h6 class="my-0">
-                        Vehicle
+                        Vozilo
                       </h6>
                       <small class="text-body-secondary">
                         {{ vehiclePreview }}
@@ -69,7 +69,7 @@
                   <li class="list-group-item d-flex justify-content-between lh-sm">
                     <div>
                       <h6 class="my-0">
-                        Preferred time
+                        Željeni termin
                       </h6>
                       <small class="text-body-secondary">
                         {{ appointmentPreview }}
@@ -79,13 +79,13 @@
 
                   <li class="list-group-item d-flex justify-content-between">
                     <span>Status</span>
-                    <strong class="text-primary">Request</strong>
+                    <strong class="text-primary">Zahtev</strong>
                   </li>
                 </ul>
 
                 <div class="small text-muted">
-                  After submitting, your appointment will be created with status
-                  <strong>SCHEDULED</strong>.
+                  Nakon slanja forme, vaš termin će biti kreiran sa statusom
+                  <strong>ZAKAZANO</strong>.
                 </div>
               </div>
             </div>
@@ -95,13 +95,13 @@
             <div class="card border-0 shadow-sm rounded-4">
               <div class="card-body p-4 p-md-5">
                 <h4 class="mb-3">
-                  Customer information
+                  Podaci o klijentu
                 </h4>
 
                 <form @submit.prevent="submitAppointment">
                   <div class="row g-3">
                     <div class="col-sm-6">
-                      <label for="firstName" class="form-label">First name</label>
+                      <label for="firstName" class="form-label">Ime</label>
                       <input
                         id="firstName"
                         v-model.trim="form.firstName"
@@ -112,7 +112,7 @@
                     </div>
 
                     <div class="col-sm-6">
-                      <label for="lastName" class="form-label">Last name</label>
+                      <label for="lastName" class="form-label">Prezime</label>
                       <input
                         id="lastName"
                         v-model.trim="form.lastName"
@@ -123,7 +123,7 @@
                     </div>
 
                     <div class="col-sm-6">
-                      <label for="phone" class="form-label">Phone</label>
+                      <label for="phone" class="form-label">Telefon</label>
                       <input
                         id="phone"
                         v-model.trim="form.phone"
@@ -137,28 +137,28 @@
                     <div class="col-sm-6">
                       <label for="email" class="form-label">
                         Email
-                        <span class="text-body-secondary">(optional)</span>
+                        <span class="text-body-secondary">(opciono)</span>
                       </label>
                       <input
                         id="email"
                         v-model.trim="form.email"
                         type="email"
                         class="form-control"
-                        placeholder="you@example.com"
+                        placeholder="vas@email.com"
                       />
                     </div>
 
                     <div class="col-12">
                       <label for="address" class="form-label">
-                        Address
-                        <span class="text-body-secondary">(optional)</span>
+                        Adresa
+                        <span class="text-body-secondary">(opciono)</span>
                       </label>
                       <input
                         id="address"
                         v-model.trim="form.address"
                         type="text"
                         class="form-control"
-                        placeholder="Street, city"
+                        placeholder="Ulica, grad"
                       />
                     </div>
                   </div>
@@ -166,12 +166,12 @@
                   <hr class="my-4" />
 
                   <h4 class="mb-3">
-                    Vehicle information
+                    Podaci o vozilu
                   </h4>
 
                   <div class="row g-3">
                     <div class="col-sm-6">
-                      <label for="make" class="form-label">Brand</label>
+                      <label for="make" class="form-label">Marka</label>
                       <input
                         id="make"
                         v-model.trim="form.make"
@@ -196,8 +196,8 @@
 
                     <div class="col-sm-4">
                       <label for="productionYear" class="form-label">
-                        Year
-                        <span class="text-body-secondary">(optional)</span>
+                        Godište
+                        <span class="text-body-secondary">(opciono)</span>
                       </label>
                       <input
                         id="productionYear"
@@ -211,7 +211,7 @@
 
                     <div class="col-sm-4">
                       <label for="licensePlate" class="form-label">
-                        License plate
+                        Registarska oznaka
                       </label>
                       <input
                         id="licensePlate"
@@ -224,8 +224,8 @@
 
                     <div class="col-sm-4">
                       <label for="mileage" class="form-label">
-                        Mileage
-                        <span class="text-body-secondary">(optional)</span>
+                        Kilometraža
+                        <span class="text-body-secondary">(opciono)</span>
                       </label>
                       <input
                         id="mileage"
@@ -238,8 +238,8 @@
 
                     <div class="col-12">
                       <label for="vin" class="form-label">
-                        VIN
-                        <span class="text-body-secondary">(optional)</span>
+                        VIN broj
+                        <span class="text-body-secondary">(opciono)</span>
                       </label>
                       <input
                         id="vin"
@@ -253,12 +253,12 @@
                   <hr class="my-4" />
 
                   <h4 class="mb-3">
-                    Appointment details
+                    Detalji termina
                   </h4>
 
                   <div class="row g-3">
                     <div class="col-md-6">
-                      <label for="serviceId" class="form-label">Service</label>
+                      <label for="serviceId" class="form-label">Usluga</label>
                       <select
                         id="serviceId"
                         v-model.number="form.serviceId"
@@ -266,7 +266,7 @@
                         required
                       >
                         <option :value="0" disabled>
-                          Choose service...
+                          Izaberite uslugu...
                         </option>
 
                         <option
@@ -280,7 +280,7 @@
                     </div>
 
                     <div class="col-md-6">
-                      <label for="appointmentDate" class="form-label">Date</label>
+                      <label for="appointmentDate" class="form-label">Datum</label>
                       <input
                         id="appointmentDate"
                         v-model="form.appointmentDate"
@@ -292,15 +292,15 @@
 
                     <div class="col-12">
                       <label class="form-label">
-                        Available time slots
+                        Slobodni termini
                       </label>
 
                       <div v-if="appointmentsLoading" class="text-muted">
-                        Loading appointment slots...
+                        Učitavanje termina...
                       </div>
 
                       <div v-else-if="!form.appointmentDate" class="alert alert-info mb-0">
-                        Please choose a date first.
+                        Prvo izaberite datum.
                       </div>
 
                       <div v-else class="time-slots">
@@ -325,20 +325,20 @@
                         v-if="form.appointmentDate && occupiedTimesForSelectedDate.length > 0"
                         class="form-text mt-2"
                       >
-                        Crossed times are already taken.
+                        Precrtani termini su već zauzeti.
                       </div>
                     </div>
 
                     <div class="col-12">
                       <label for="problemDescription" class="form-label">
-                        Describe the problem
+                        Opišite problem
                       </label>
                       <textarea
                         id="problemDescription"
                         v-model.trim="form.problemDescription"
                         class="form-control"
                         rows="4"
-                        placeholder="Example: Strange noise when braking, oil leak, warning light..."
+                        placeholder="Primer: Čuje se čudan zvuk pri kočenju, curi ulje, upaljena je lampica..."
                       ></textarea>
                     </div>
                   </div>
@@ -356,7 +356,7 @@
                       aria-hidden="true"
                     ></span>
 
-                    {{ submitting ? 'Submitting...' : 'Book appointment' }}
+                    {{ submitting ? 'Slanje...' : 'Zakaži termin' }}
                   </button>
                 </form>
               </div>
@@ -367,7 +367,6 @@
     </section>
   </main>
 </template>
-
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import type { Service } from '@/types/services'
@@ -440,7 +439,7 @@ const selectedService = computed(() => {
 
 const vehiclePreview = computed(() => {
   if (!form.make && !form.model) {
-    return 'No vehicle entered'
+    return 'Vozilo nije uneto'
   }
 
   return `${form.make} ${form.model}`.trim()
@@ -448,7 +447,7 @@ const vehiclePreview = computed(() => {
 
 const appointmentPreview = computed(() => {
   if (!form.appointmentDate || !form.appointmentTime) {
-    return 'No time selected'
+    return 'Vreme nije izabrano'
   }
 
   return `${form.appointmentDate} at ${form.appointmentTime}`
@@ -681,6 +680,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
+#hero {
+    background-image: 
+    linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),
+    url('/images/customers/landingHero3.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
 .booking-hero {
   background:
     linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),

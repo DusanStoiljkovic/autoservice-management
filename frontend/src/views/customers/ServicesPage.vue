@@ -1,23 +1,23 @@
 <template>
   <main class="services-page">
-    <section class="services-hero text-white">
+    <section id="hero" class="services-hero text-white">
       <div class="container py-5">
         <div class="row align-items-center min-vh-50">
           <div class="col-lg-8">
             <span class="badge text-bg-primary mb-3">
-              Our Services
+              Naše usluge
             </span>
 
             <h1 class="display-4 fw-bold mb-3">
-              Professional car repair and maintenance.
+              Profesionalna popravka i održavanje automobila.
             </h1>
 
             <p class="lead text-white-50 mb-4">
-              Choose the service your vehicle needs and schedule an appointment online.
+              Izaberite uslugu koja je potrebna vašem vozilu i zakažite termin online.
             </p>
 
             <RouterLink class="btn btn-primary btn-lg" to="/book-appointment">
-              Book Appointment
+              Zakaži termin
             </RouterLink>
           </div>
         </div>
@@ -28,11 +28,11 @@
       <div class="container">
         <div class="text-center mb-5">
           <h2 class="fw-bold">
-            Available Services
+            Dostupne usluge
           </h2>
 
           <p class="text-muted mb-0">
-            Everything your vehicle needs in one place.
+            Sve što je vašem vozilu potrebno na jednom mestu.
           </p>
         </div>
 
@@ -58,14 +58,14 @@
 
                 <div class="d-flex justify-content-between align-items-center mt-4">
                   <span class="fw-bold text-primary">
-                    from {{ formatPrice(service.price) }}
+                    od {{ formatPrice(service.price) }}
                   </span>
 
                   <RouterLink
                     class="btn btn-outline-primary btn-sm"
                     to="/book-appointment"
                   >
-                    Book now
+                    Zakaži
                   </RouterLink>
                 </div>
               </div>
@@ -80,49 +80,49 @@
         <div class="row align-items-center g-5">
           <div class="col-lg-6">
             <h2 class="fw-bold mb-3">
-              Not sure what your car needs?
+              Niste sigurni šta je potrebno vašem automobilu?
             </h2>
 
             <p class="lead text-muted">
-              Send us an appointment request and describe the problem.
-              Our mechanic will inspect the vehicle and recommend the right service.
+              Pošaljite zahtev za termin i opišite problem.
+              Naš majstor će pregledati vozilo i preporučiti odgovarajuću uslugu.
             </p>
 
             <ul class="list-unstyled mt-4">
               <li class="mb-3">
-                ✅ Computer diagnostics
+                ✅ Kompjuterska dijagnostika
               </li>
 
               <li class="mb-3">
-                ✅ Transparent repair process
+                ✅ Transparentan proces popravke
               </li>
 
               <li class="mb-3">
-                ✅ Clear service prices
+                ✅ Jasne cene usluga
               </li>
 
               <li class="mb-3">
-                ✅ Professional maintenance
+                ✅ Profesionalno održavanje
               </li>
             </ul>
 
             <RouterLink class="btn btn-primary mt-3" to="/book-appointment">
-              Schedule Service
+              Zakaži servis
             </RouterLink>
           </div>
 
           <div class="col-lg-6">
             <div class="info-box rounded-4 shadow-sm p-4">
               <h5 class="fw-bold mb-4">
-                Service Process
+                Proces servisiranja
               </h5>
 
               <div class="process-item">
                 <span class="process-number">1</span>
                 <div>
-                  <h6 class="fw-bold mb-1">Book appointment</h6>
+                  <h6 class="fw-bold mb-1">Zakazivanje termina</h6>
                   <p class="text-muted mb-0">
-                    Choose a service and send your request.
+                    Izaberite uslugu i pošaljite zahtev za servis.
                   </p>
                 </div>
               </div>
@@ -130,9 +130,9 @@
               <div class="process-item">
                 <span class="process-number">2</span>
                 <div>
-                  <h6 class="fw-bold mb-1">Vehicle inspection</h6>
+                  <h6 class="fw-bold mb-1">Pregled vozila</h6>
                   <p class="text-muted mb-0">
-                    Our mechanic checks the vehicle and confirms the work.
+                    Naš majstor proverava vozilo i potvrđuje potreban rad.
                   </p>
                 </div>
               </div>
@@ -140,9 +140,9 @@
               <div class="process-item">
                 <span class="process-number">3</span>
                 <div>
-                  <h6 class="fw-bold mb-1">Repair order</h6>
+                  <h6 class="fw-bold mb-1">Radni nalog</h6>
                   <p class="text-muted mb-0">
-                    The repair process is organized through a service order.
+                    Proces popravke se organizuje kroz servisni radni nalog.
                   </p>
                 </div>
               </div>
@@ -150,9 +150,9 @@
               <div class="process-item border-0 pb-0">
                 <span class="process-number">4</span>
                 <div>
-                  <h6 class="fw-bold mb-1">Invoice</h6>
+                  <h6 class="fw-bold mb-1">Račun</h6>
                   <p class="text-muted mb-0">
-                    After the repair, the invoice is created and payment is tracked.
+                    Nakon završene popravke kreira se račun i evidentira plaćanje.
                   </p>
                 </div>
               </div>
@@ -188,12 +188,12 @@ async function fetchServices() {
 
         const response = await fetch(`${API_URL}/services/all`)
         if (!response.ok) {
-            throw new Error('Failed to fetch services')
+            throw new Error('Neuspešno učitavanje usluga')
         }
 
         services.value = await response.json()
     } catch (error) {
-        errorMessage.value = 'Could not load services. Please try again later.'
+        errorMessage.value = 'Usluge trenutno ne mogu da se učitaju. Pokušajte ponovo kasnije.'
     } finally {
         loading.value = false
     }
@@ -242,8 +242,15 @@ onMounted(() => {
 
 
 </script>
-
 <style scoped>
+  #hero {
+    background-image: 
+    linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),
+    url('/images/customers/landingHero3.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
 .services-hero {
   background:
     linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),
