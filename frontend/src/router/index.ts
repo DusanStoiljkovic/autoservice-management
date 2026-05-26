@@ -3,6 +3,7 @@ import RegisterPage from '@/views/auth/RegisterPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import LandingPage from '@/views/customers/LandingPage.vue'
 import ServicesPage from '@/views/customers/ServicesPage.vue'
+import BookAppointmentPage from '@/views/customers/BookAppointmentPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       path: '/services',
       name: 'services-page',
       component: ServicesPage,
+    }, 
+    {
+      path: '/book-appointment',
+      name: 'book-appointment-page',
+      component: BookAppointmentPage,
     }
   ],
 })
