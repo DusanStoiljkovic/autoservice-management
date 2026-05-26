@@ -1,4 +1,5 @@
 import LoginPage from '@/views/auth/LoginPage.vue'
+import RegisterPage from '@/views/auth/RegisterPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -9,6 +10,11 @@ const router = createRouter({
       name: 'login-page',
       component: LoginPage,
     },
+    {
+      path: '/register',
+      name: 'register-page',
+      component: RegisterPage,
+    }
   ],
 })
 
