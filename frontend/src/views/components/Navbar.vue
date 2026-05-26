@@ -1,24 +1,24 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <RouterLink class="navbar-brand" to="/">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+      <RouterLink class="navbar-brand fw-bold" to="/">
         AutoService
       </RouterLink>
 
       <button
         class="navbar-toggler"
         type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#mainNavbar"
-        aria-controls="mainNavbar"
+        data-bs-toggle="collapse"-
+        data-bs-target="#customerNavbar"
+        aria-controls="customerNavbar"
         aria-expanded="false"
         aria-label="Toggle navigation"
       >
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="mainNavbar">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <div id="customerNavbar" class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
           <li class="nav-item">
             <RouterLink class="nav-link" to="/">
               Home
@@ -26,67 +26,41 @@
           </li>
 
           <li class="nav-item">
-            <RouterLink class="nav-link" to="/customers">
-              Customers
+            <RouterLink class="nav-link" to="/services">
+              Services
             </RouterLink>
           </li>
 
           <li class="nav-item">
-            <RouterLink class="nav-link" to="/vehicles">
-              Vehicles
+            <RouterLink class="nav-link" to="/book-appointment">
+              Book Appointment
             </RouterLink>
           </li>
 
           <li class="nav-item">
-            <RouterLink class="nav-link" to="/appointments">
-              Appointments
+            <RouterLink class="nav-link" to="/about">
+              About
             </RouterLink>
           </li>
 
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              More
-            </a>
+          <li class="nav-item">
+            <RouterLink class="nav-link" to="/contact">
+              Contact
+            </RouterLink>
+          </li>
 
-            <ul class="dropdown-menu">
-              <li>
-                <RouterLink class="dropdown-item" to="/services">
-                  Services
-                </RouterLink>
-              </li>
+          <li class="nav-item ms-lg-3">
+            <RouterLink class="btn btn-outline-light btn-sm" to="/login">
+              Mechanic Login
+            </RouterLink>
+          </li>
 
-              <li>
-                <RouterLink class="dropdown-item" to="/repair-orders">
-                  Repair Orders
-                </RouterLink>
-              </li>
-
-              <li>
-                <RouterLink class="dropdown-item" to="/invoices">
-                  Invoices
-                </RouterLink>
-              </li>
-            </ul>
+          <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+            <RouterLink class="btn btn-primary btn-sm" to="/book-appointment">
+              Schedule Service
+            </RouterLink>
           </li>
         </ul>
-
-        <form class="d-flex" role="search">
-          <input
-            class="form-control me-2"
-            type="search"
-            placeholder="Search"
-          />
-
-          <button class="btn btn-outline-light" type="submit">
-            Search
-          </button>
-        </form>
       </div>
     </div>
   </nav>
@@ -95,3 +69,18 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 </script>
+
+<style scoped>
+.navbar-brand {
+  letter-spacing: 0.3px;
+}
+
+.nav-link.router-link-active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.nav-link {
+  transition: color 0.2s ease;
+}
+</style>
