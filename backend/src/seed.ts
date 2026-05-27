@@ -9,7 +9,6 @@ import { Vehicles } from './entities/Vehicles'
 import { Services } from './entities/Services'
 import { Appointments, AppointmentStatus } from './entities/Appointments'
 import { RepairOrders, RepairOrderStatus } from './entities/RepairOrders'
-import { RepairOrderItems } from './entities/RepairOrderItems'
 import { Invoices, InvoiceStatus } from './entities/Invoices'
 
 const SALT_ROUNDS = 10
@@ -23,13 +22,15 @@ async function resetDatabase() {
     await queryRunner.query('SET FOREIGN_KEY_CHECKS = 0')
 
     await queryRunner.query('TRUNCATE TABLE invoices')
-    await queryRunner.query('TRUNCATE TABLE repair_order_items')
+    await queryRunner.query('TRUNCATE TABLE repair_order_services')
     await queryRunner.query('TRUNCATE TABLE repair_orders')
     await queryRunner.query('TRUNCATE TABLE appointments')
     await queryRunner.query('TRUNCATE TABLE vehicles')
     await queryRunner.query('TRUNCATE TABLE customers')
     await queryRunner.query('TRUNCATE TABLE services')
     await queryRunner.query('TRUNCATE TABLE users')
+
+    await queryRunner.query('DROP TABLE IF EXISTS repair_order_items')
 
     await queryRunner.query('SET FOREIGN_KEY_CHECKS = 1')
   } finally {
@@ -50,6 +51,12 @@ function calculateTax(subtotal: number) {
   }
 }
 
+function calculateServicesSubtotal(services: Services[]) {
+  return services.reduce((total, service) => {
+    return total + Number(service.price)
+  }, 0)
+}
+
 async function seed() {
   await AppDataSource.initialize()
 
@@ -65,7 +72,6 @@ async function seed() {
     const servicesRepository = AppDataSource.getRepository(Services)
     const appointmentsRepository = AppDataSource.getRepository(Appointments)
     const repairOrdersRepository = AppDataSource.getRepository(RepairOrders)
-    const repairOrderItemsRepository = AppDataSource.getRepository(RepairOrderItems)
     const invoicesRepository = AppDataSource.getRepository(Invoices)
 
     const defaultPasswordHash = await bcrypt.hash('Password123!', SALT_ROUNDS)
@@ -472,11 +478,8 @@ async function seed() {
     const akumulator = getService('Zamena akumulatora')
     const klima = getService('Servis klime')
     const trap = getService('Reglaza trapa')
-    const amortizeri = getService('Zamena amortizera')
     const kvacilo = getService('Zamena kvacila')
-    const svecice = getService('Zamena svecica')
     const sijalice = getService('Zamena sijalica')
-    const pregled = getService('Pregled pred kupovinu')
 
     console.log('Seeding appointments...')
 
@@ -587,6 +590,7 @@ async function seed() {
         diagnosis: 'Uradjena zamena ulja i filtera. Klima dopunjena freonom.',
         startedAt: new Date('2026-06-01T09:10:00'),
         completedAt: new Date('2026-06-01T11:00:00'),
+        services: [maliServis, klima],
       }),
       repairOrdersRepository.create({
         customerId: customers[4].id,
@@ -595,9 +599,10 @@ async function seed() {
         mechanicId: aleksandar.id,
         status: RepairOrderStatus.COMPLETED,
         problemDescription: 'Upaljena check engine lampica.',
-        diagnosis: 'Pronadjena greska lambda sonde. Izvrsena zamena i brisanje gresaka.',
+        diagnosis: 'Pronadjena greska lambda sonde. Izvrsena dijagnostika i brisanje gresaka.',
         startedAt: new Date('2026-06-01T11:40:00'),
         completedAt: new Date('2026-06-01T14:20:00'),
+        services: [dijagnostika],
       }),
       repairOrdersRepository.create({
         customerId: customers[1].id,
@@ -609,6 +614,7 @@ async function seed() {
         diagnosis: 'Prednje plocice istrosene. Diskovi imaju ivicu i preporucena je zamena.',
         startedAt: new Date('2026-06-02T09:45:00'),
         completedAt: null,
+        services: [kocnice],
       }),
       repairOrdersRepository.create({
         customerId: customers[3].id,
@@ -620,6 +626,7 @@ async function seed() {
         diagnosis: 'Zamenjen set zupcastog kaisa, vodena pumpa i rashladna tecnost.',
         startedAt: new Date('2026-06-03T08:45:00'),
         completedAt: new Date('2026-06-03T15:30:00'),
+        services: [velikiServis],
       }),
       repairOrdersRepository.create({
         customerId: customers[5].id,
@@ -631,6 +638,7 @@ async function seed() {
         diagnosis: 'Potrebna reglaza trapa i balansiranje tockova.',
         startedAt: new Date('2026-06-03T12:20:00'),
         completedAt: null,
+        services: [trap],
       }),
       repairOrdersRepository.create({
         customerId: customers[6].id,
@@ -642,6 +650,7 @@ async function seed() {
         diagnosis: 'Akumulator slab. Alternator puni ispravno. Akumulator zamenjen.',
         startedAt: new Date('2026-06-04T10:10:00'),
         completedAt: new Date('2026-06-04T10:55:00'),
+        services: [akumulator],
       }),
       repairOrdersRepository.create({
         customerId: customers[8].id,
@@ -653,6 +662,7 @@ async function seed() {
         diagnosis: 'Klima treba dopunu freona. Sijalica pregorela.',
         startedAt: new Date('2026-06-05T09:15:00'),
         completedAt: null,
+        services: [klima, sijalice],
       }),
       repairOrdersRepository.create({
         customerId: customers[9].id,
@@ -664,235 +674,17 @@ async function seed() {
         diagnosis: 'Set kvacila istrosen. Zamenjen set kvacila i provereno curenje ulja.',
         startedAt: new Date('2026-06-05T11:45:00'),
         completedAt: new Date('2026-06-05T18:00:00'),
-      }),
-    ])
-
-    console.log('Seeding repair order items...')
-
-    await repairOrderItemsRepository.save([
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[0].id,
-        serviceId: maliServis.id,
-        itemType: 'SERVICE',
-        description: 'Mali servis',
-        quantity: 1,
-        unitPrice: '8500.00',
-        totalPrice: '8500.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[0].id,
-        serviceId: klima.id,
-        itemType: 'SERVICE',
-        description: 'Servis klime',
-        quantity: 1,
-        unitPrice: '6500.00',
-        totalPrice: '6500.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[0].id,
-        serviceId: null,
-        itemType: 'PART',
-        description: 'Motorno ulje 5W-30 5L',
-        quantity: 1,
-        unitPrice: '5200.00',
-        totalPrice: '5200.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[0].id,
-        serviceId: null,
-        itemType: 'PART',
-        description: 'Filter kabine',
-        quantity: 1,
-        unitPrice: '1800.00',
-        totalPrice: '1800.00',
-      }),
-
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[1].id,
-        serviceId: dijagnostika.id,
-        itemType: 'SERVICE',
-        description: 'Racunarska dijagnostika',
-        quantity: 1,
-        unitPrice: '3000.00',
-        totalPrice: '3000.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[1].id,
-        serviceId: null,
-        itemType: 'PART',
-        description: 'Lambda sonda',
-        quantity: 1,
-        unitPrice: '16500.00',
-        totalPrice: '16500.00',
-      }),
-
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[2].id,
-        serviceId: kocnice.id,
-        itemType: 'SERVICE',
-        description: 'Zamena prednjih diskova i plocica',
-        quantity: 1,
-        unitPrice: '18000.00',
-        totalPrice: '18000.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[2].id,
-        serviceId: null,
-        itemType: 'PART',
-        description: 'Prednji diskovi set',
-        quantity: 1,
-        unitPrice: '22000.00',
-        totalPrice: '22000.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[2].id,
-        serviceId: null,
-        itemType: 'PART',
-        description: 'Prednje plocice set',
-        quantity: 1,
-        unitPrice: '9500.00',
-        totalPrice: '9500.00',
-      }),
-
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[3].id,
-        serviceId: velikiServis.id,
-        itemType: 'SERVICE',
-        description: 'Veliki servis',
-        quantity: 1,
-        unitPrice: '42000.00',
-        totalPrice: '42000.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[3].id,
-        serviceId: null,
-        itemType: 'PART',
-        description: 'Set zupcastog kaisa',
-        quantity: 1,
-        unitPrice: '28500.00',
-        totalPrice: '28500.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[3].id,
-        serviceId: null,
-        itemType: 'PART',
-        description: 'Vodena pumpa',
-        quantity: 1,
-        unitPrice: '8700.00',
-        totalPrice: '8700.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[3].id,
-        serviceId: null,
-        itemType: 'PART',
-        description: 'Rashladna tecnost',
-        quantity: 2,
-        unitPrice: '1200.00',
-        totalPrice: '2400.00',
-      }),
-
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[4].id,
-        serviceId: trap.id,
-        itemType: 'SERVICE',
-        description: 'Reglaza trapa',
-        quantity: 1,
-        unitPrice: '4000.00',
-        totalPrice: '4000.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[4].id,
-        serviceId: null,
-        itemType: 'PART',
-        description: 'Balans tegovi',
-        quantity: 4,
-        unitPrice: '350.00',
-        totalPrice: '1400.00',
-      }),
-
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[5].id,
-        serviceId: akumulator.id,
-        itemType: 'SERVICE',
-        description: 'Zamena akumulatora',
-        quantity: 1,
-        unitPrice: '2500.00',
-        totalPrice: '2500.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[5].id,
-        serviceId: null,
-        itemType: 'PART',
-        description: 'Akumulator 60Ah',
-        quantity: 1,
-        unitPrice: '14500.00',
-        totalPrice: '14500.00',
-      }),
-
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[6].id,
-        serviceId: klima.id,
-        itemType: 'SERVICE',
-        description: 'Servis klime',
-        quantity: 1,
-        unitPrice: '6500.00',
-        totalPrice: '6500.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[6].id,
-        serviceId: sijalice.id,
-        itemType: 'SERVICE',
-        description: 'Zamena sijalice',
-        quantity: 1,
-        unitPrice: '1500.00',
-        totalPrice: '1500.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[6].id,
-        serviceId: null,
-        itemType: 'PART',
-        description: 'H7 sijalica',
-        quantity: 1,
-        unitPrice: '900.00',
-        totalPrice: '900.00',
-      }),
-
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[7].id,
-        serviceId: kvacilo.id,
-        itemType: 'SERVICE',
-        description: 'Zamena kvacila',
-        quantity: 1,
-        unitPrice: '35000.00',
-        totalPrice: '35000.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[7].id,
-        serviceId: null,
-        itemType: 'PART',
-        description: 'Set kvacila',
-        quantity: 1,
-        unitPrice: '52000.00',
-        totalPrice: '52000.00',
-      }),
-      repairOrderItemsRepository.create({
-        repairOrderId: repairOrders[7].id,
-        serviceId: null,
-        itemType: 'PART',
-        description: 'Ulje menjaca',
-        quantity: 2,
-        unitPrice: '1800.00',
-        totalPrice: '3600.00',
+        services: [kvacilo],
       }),
     ])
 
     console.log('Seeding invoices...')
 
-    const invoice1 = calculateTax(22000)
-    const invoice2 = calculateTax(19500)
-    const invoice3 = calculateTax(81600)
-    const invoice4 = calculateTax(17000)
-    const invoice5 = calculateTax(90600)
+    const invoice1 = calculateTax(calculateServicesSubtotal([maliServis, klima]))
+    const invoice2 = calculateTax(calculateServicesSubtotal([dijagnostika]))
+    const invoice3 = calculateTax(calculateServicesSubtotal([velikiServis]))
+    const invoice4 = calculateTax(calculateServicesSubtotal([akumulator]))
+    const invoice5 = calculateTax(calculateServicesSubtotal([kvacilo]))
 
     await invoicesRepository.save([
       invoicesRepository.create({
@@ -952,6 +744,10 @@ async function seed() {
       }),
     ])
 
+    const repairOrderServiceLinksCount = repairOrders.reduce((total, repairOrder) => {
+      return total + (repairOrder.services?.length || 0)
+    }, 0)
+
     console.log('')
     console.log('Seed completed successfully.')
     console.log('')
@@ -962,6 +758,8 @@ async function seed() {
     console.log(`Services: ${services.length}`)
     console.log(`Appointments: ${appointments.length}`)
     console.log(`Repair orders: ${repairOrders.length}`)
+    console.log(`Repair order service links: ${repairOrderServiceLinksCount}`)
+    console.log(`Invoices: 5`)
     console.log('')
     console.log('Test accounts:')
     console.log('Admin:       admin@autoservice.rs / Password123!')

@@ -3,6 +3,8 @@ import {
   Entity,
   Index,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -108,6 +110,17 @@ export class RepairOrders {
   @JoinColumn([{ name: "vehicle_id", referencedColumnName: "id" }])
   vehicle: Vehicles;
 
-  @OneToMany(() => Services, (services) => services.repairOrder)
-  services: Relation<Services>[];
+  @ManyToMany(() => Services, (service) => service.repairOrders)
+  @JoinTable({
+    name: "repair_order_services",
+    joinColumn: {
+      name: "repair_order_id",
+      referencedColumnName: "id",
+    },
+    inverseJoinColumn: {
+      name: "service_id",
+      referencedColumnName: "id",
+    },
+  })
+  services: Relation<Services[]>;
 }

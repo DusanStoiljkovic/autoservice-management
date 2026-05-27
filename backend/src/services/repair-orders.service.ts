@@ -8,9 +8,18 @@ export class OrderService {
 
   static async getAll() {
     return await this.repo.find({
+      select: {
+        services: {
+          name: true,
+          price: true,
+        },
+      },
       order: {
         id: "ASC",
       },
+      relations: {
+        services: true,
+      }
     })
   }
 

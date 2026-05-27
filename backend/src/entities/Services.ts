@@ -2,12 +2,11 @@ import {
   Column,
   Entity,
   Index,
-  ManyToOne,
-  OneToMany,
+  ManyToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 
-import type { Relation } from "typeorm"
+import type { Relation } from "typeorm";
 import { RepairOrders } from "./RepairOrders";
 
 @Index("idx_services_is_active", ["isActive"], {})
@@ -48,6 +47,6 @@ export class Services {
   })
   updatedAt: Date;
 
-  @ManyToOne(() => RepairOrders, (repairOrders) => repairOrders.services)
-  repairOrder: Relation<RepairOrders>;
+  @ManyToMany(() => RepairOrders, (repairOrder) => repairOrder.services)
+  repairOrders: Relation<RepairOrders[]>;
 }
