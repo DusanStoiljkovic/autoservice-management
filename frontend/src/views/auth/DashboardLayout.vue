@@ -59,30 +59,6 @@ const stats = computed(() => {
   }
 ]})
 
-const appointments = [
-  {
-    id: 1,
-    time: '08:00',
-    customer: 'Marko Petrović',
-    vehicle: 'BMW 320d',
-    status: 'Zakazano'
-  },
-  {
-    id: 2,
-    time: '10:00',
-    customer: 'Nikola Jovanović',
-    vehicle: 'Audi A4',
-    status: 'Potvrđeno'
-  },
-  {
-    id: 3,
-    time: '12:00',
-    customer: 'Ivan Ilić',
-    vehicle: 'Golf 7',
-    status: 'U toku'
-  }
-]
-
 function getStatusClass(status: string) {
   if (status === 'Potvrđeno') {
     return 'text-bg-success'
@@ -184,11 +160,11 @@ onMounted( async() => {
 
                   <tbody>
                     <tr
-                      v-for="appointment in appointments"
+                      v-for="appointment in allAppointments"
                       :key="appointment.id"
                     >
                       <td>{{ appointment.time }}</td>
-                      <td>{{ appointment.customer }}</td>
+                      <td>{{ appointment.customer.Id }}</td>
                       <td>{{ appointment.vehicle }}</td>
                       <td>
                         <span class="badge" :class="getStatusClass(appointment.status)">

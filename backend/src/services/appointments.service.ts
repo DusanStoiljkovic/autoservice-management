@@ -8,15 +8,25 @@ export class AppointmentService {
     return AppDataSource.getRepository(Appointments)
   }
 
-  static async getAll() {
-    return await this.repo.find({
-      relations: {
-        repairOrders: true,
-      },
-      order: {
-        scheduledAt: "ASC",
-      },
-    })
+  static async getAll(query: any) {
+    const queryBuilder = this.repo.createQueryBuilder("appointment")
+    if (query.status) {
+      queryBuilder.andWhere("appointment.status = :status", { status: query.status })
+    }
+    if (query.dateFrom) {
+      queryBuilder.andWhere("appointment.scheduledAt >= :dateFrom", { dateFrom: query.dateFrom })
+    }
+    if (query.dateTo) {
+      queryBuilder.andWhere("appointment.scheduledAt <= :dateTo", { dateTo: query.dateTo })
+    }
+    if (query.customerId) {
+      queryBuilder.andWhere("appointment.customerId = :customerId", { customerId: query.customerId})
+    }
+    if (query.vehicleId) {
+      queryBuilder.andWhere("appointment.vehicleId = :vehicleId", { vehicleId: query.vehicleId })
+    }
+
+    return await queryBuilder.getMany()
   }
 
   static async getById(id: number) {

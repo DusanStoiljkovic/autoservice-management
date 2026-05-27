@@ -5,8 +5,10 @@ import { AppointmentService } from "../services/appointments.service"
 export const AppointmentRoute = Router()
 
 AppointmentRoute.get("/all", async (req, res) => {
+  // query -> status, dateFrom, dateTo, customerId, vehicleId
+  const query = req.query
   await defineRequest(res, async () => {
-    return await AppointmentService.getAll()
+    return await AppointmentService.getAll(query)
   })
 })
 
