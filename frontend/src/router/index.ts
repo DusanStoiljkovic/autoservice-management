@@ -1,51 +1,64 @@
-import LoginPage from '@/views/auth/LoginPage.vue'
-import RegisterPage from '@/views/auth/RegisterPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import LandingPage from '@/views/customers/LandingPage.vue'
-import ServicesPage from '@/views/customers/ServicesPage.vue'
-import BookAppointmentPage from '@/views/customers/BookAppointmentPage.vue'
-import ContactPage from '@/views/customers/ContactPage.vue'
-import AboutPage from '@/views/customers/AboutPage.vue'
+
+import LandingPage from '../views/customers/LandingPage.vue'
+import ServicesPage from '../views/customers/ServicesPage.vue'
+import BookAppointmentPage from '../views/customers/BookAppointmentPage.vue'
+import AboutPage from '../views/customers/AboutPage.vue'
+import ContactPage from '../views/customers/ContactPage.vue'
+
+import LoginPage from '../views/auth/LoginPage.vue'
+import RegisterPage from '../views/auth/RegisterPage.vue'
+import DashboardLayout from '../views/auth/DashboardLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+
   routes: [
     {
-      path: '/login',
-      name: 'login-page',
-      component: LoginPage,
+      path: '/',
+      name: 'home',
+      component: LandingPage
     },
     {
-      path: '/register',
-      name: 'register-page',
-      component: RegisterPage,
-    }, 
-    {
-      path: '/',
-      name: 'home-page',
-      component: LandingPage,
-    }, 
-    {
       path: '/services',
-      name: 'services-page',
-      component: ServicesPage,
-    }, 
+      name: 'services',
+      component: ServicesPage
+    },
     {
       path: '/book-appointment',
-      name: 'book-appointment-page',
-      component: BookAppointmentPage,
+      name: 'book-appointment',
+      component: BookAppointmentPage
     },
     {
       path: '/about',
-      name: 'about-page',
-      component: AboutPage,
+      name: 'about',
+      component: AboutPage
     },
     {
       path: '/contact',
-      name: 'contact-page',
-      component: ContactPage,
+      name: 'contact',
+      component: ContactPage
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginPage
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: RegisterPage
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: DashboardLayout
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/'
     }
-  ],
+  ]
 })
 
 export default router

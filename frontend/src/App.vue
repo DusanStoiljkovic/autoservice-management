@@ -6,7 +6,7 @@ import Footer from './views/components/Footer.vue'
 
 <template>
   <div class="app-layout min-vh-100 d-flex flex-column bg-body text-body">
-    <Navbar />
+    <Navbar v-if="!$route.path.startsWith('/dashboard')" />
 
     <main class="flex-grow-1">
       <RouterView />
