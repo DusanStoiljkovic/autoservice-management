@@ -3,7 +3,6 @@ import { DataSource } from "typeorm";
 import { Appointments } from "../entities/Appointments";
 import { Customers } from "../entities/Customers";
 import { Invoices } from "../entities/Invoices";
-import { RepairOrderItems } from "../entities/RepairOrderItems";
 import { RepairOrders } from "../entities/RepairOrders";
 import { Services } from "../entities/Services";
 import { Users } from "../entities/Users";
@@ -19,5 +18,5 @@ export const AppDataSource = new DataSource({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     synchronize: true,
-    entities: [Invoices, Users, Customers, Appointments, RepairOrders, Services, Vehicles, RepairOrderItems],
+    entities: [Invoices, Users, Customers, Appointments, RepairOrders, Services, Vehicles],
 })

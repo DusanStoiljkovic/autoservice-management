@@ -9,12 +9,12 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Invoices } from "./Invoices";
-import { RepairOrderItems } from "./RepairOrderItems";
 import { Appointments } from "./Appointments";
 import { Customers } from "./Customers";
 import { Users } from "./Users";
 import { Vehicles } from "./Vehicles";
 import type { Relation } from "typeorm";
+import { Services } from "./Services";
 
 export enum RepairOrderStatus {
   OPEN = "OPEN",
@@ -80,12 +80,6 @@ export class RepairOrders {
   @OneToOne(() => Invoices, (invoices) => invoices.repairOrder)
   invoices: Invoices;
 
-  @OneToMany(
-    () => RepairOrderItems,
-    (repairOrderItems) => repairOrderItems.repairOrder
-  )
-  repairOrderItems: RepairOrderItems[];
-
   @OneToOne(() => Appointments, (appointments) => appointments.repairOrders, {
     onDelete: "SET NULL",
     onUpdate: "CASCADE",
@@ -113,4 +107,7 @@ export class RepairOrders {
   })
   @JoinColumn([{ name: "vehicle_id", referencedColumnName: "id" }])
   vehicle: Vehicles;
+
+  @OneToMany(() => Services, (services) => services.repairOrder)
+  services: Relation<Services>[];
 }

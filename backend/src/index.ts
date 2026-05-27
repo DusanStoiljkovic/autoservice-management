@@ -12,7 +12,6 @@ import ServiceRoute from './routes/services.routes'
 import OrderRoute  from './routes/repair-orders.routes'
 import InvoiceRoute from './routes/invoices.routes'
 import AuthRoute from './routes/auth.routes'
-import RepairOrderItemsRoute from './routes/repair-order-items.routes'
 import { UserRoute } from './routes/users.routes'
 
 const app = express()
@@ -35,7 +34,6 @@ app.use('/api/vehicles', VehicleRoute)
 app.use('/api/appointments', AppointmentRoute)
 app.use('/api/services', ServiceRoute)
 app.use('/api/repair-orders', OrderRoute)
-app.use('/api/repair-order-items', RepairOrderItemsRoute)
 app.use('/api/invoices', InvoiceRoute)
 
 
