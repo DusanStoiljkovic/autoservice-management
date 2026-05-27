@@ -1,5 +1,5 @@
 <template>
-  <main class="services-page">
+  <main class="services-page bg-body text-body">
     <section id="hero" class="services-hero text-white">
       <div class="container py-5">
         <div class="row align-items-center min-vh-50">
@@ -24,25 +24,43 @@
       </div>
     </section>
 
-    <section class="py-5 bg-light">
+    <section class="py-5 bg-body-tertiary">
       <div class="container">
         <div class="text-center mb-5">
           <h2 class="fw-bold">
             Dostupne usluge
           </h2>
 
-          <p class="text-muted mb-0">
+          <p class="text-body-secondary mb-0">
             Sve što je vašem vozilu potrebno na jednom mestu.
           </p>
         </div>
 
-        <div class="row g-4">
+        <div v-if="loading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Učitavanje...</span>
+          </div>
+
+          <p class="text-body-secondary mt-3 mb-0">
+            Učitavanje usluga...
+          </p>
+        </div>
+
+        <div v-else-if="errorMessage" class="alert alert-danger text-center">
+          {{ errorMessage }}
+        </div>
+
+        <div v-else-if="activeServices.length === 0" class="alert alert-warning text-center">
+          Trenutno nema dostupnih usluga.
+        </div>
+
+        <div v-else class="row g-4">
           <div
             v-for="service in activeServices"
             :key="service.id"
             class="col-md-6 col-lg-4"
           >
-            <div class="card service-card h-100 border-0 shadow-sm rounded-4">
+            <div class="card service-card app-card h-100 shadow-sm rounded-4">
               <div class="card-body p-4">
                 <div class="service-icon mb-3">
                   {{ getServiceIcon(service.name) }}
@@ -52,7 +70,7 @@
                   {{ service.name }}
                 </h5>
 
-                <p class="card-text text-muted">
+                <p class="card-text text-body-secondary">
                   {{ service.description }}
                 </p>
 
@@ -75,7 +93,7 @@
       </div>
     </section>
 
-    <section class="py-5">
+    <section class="py-5 bg-body">
       <div class="container">
         <div class="row align-items-center g-5">
           <div class="col-lg-6">
@@ -83,7 +101,7 @@
               Niste sigurni šta je potrebno vašem automobilu?
             </h2>
 
-            <p class="lead text-muted">
+            <p class="lead text-body-secondary">
               Pošaljite zahtev za termin i opišite problem.
               Naš majstor će pregledati vozilo i preporučiti odgovarajuću uslugu.
             </p>
@@ -112,7 +130,7 @@
           </div>
 
           <div class="col-lg-6">
-            <div class="info-box rounded-4 shadow-sm p-4">
+            <div class="app-card rounded-4 shadow-sm p-4">
               <h5 class="fw-bold mb-4">
                 Proces servisiranja
               </h5>
@@ -121,7 +139,7 @@
                 <span class="process-number">1</span>
                 <div>
                   <h6 class="fw-bold mb-1">Zakazivanje termina</h6>
-                  <p class="text-muted mb-0">
+                  <p class="text-body-secondary mb-0">
                     Izaberite uslugu i pošaljite zahtev za servis.
                   </p>
                 </div>
@@ -131,7 +149,7 @@
                 <span class="process-number">2</span>
                 <div>
                   <h6 class="fw-bold mb-1">Pregled vozila</h6>
-                  <p class="text-muted mb-0">
+                  <p class="text-body-secondary mb-0">
                     Naš majstor proverava vozilo i potvrđuje potreban rad.
                   </p>
                 </div>
@@ -141,17 +159,17 @@
                 <span class="process-number">3</span>
                 <div>
                   <h6 class="fw-bold mb-1">Radni nalog</h6>
-                  <p class="text-muted mb-0">
+                  <p class="text-body-secondary mb-0">
                     Proces popravke se organizuje kroz servisni radni nalog.
                   </p>
                 </div>
               </div>
 
-              <div class="process-item border-0 pb-0">
+              <div class="process-item border-0 pb-0 mb-0">
                 <span class="process-number">4</span>
                 <div>
                   <h6 class="fw-bold mb-1">Račun</h6>
-                  <p class="text-muted mb-0">
+                  <p class="text-body-secondary mb-0">
                     Nakon završene popravke kreira se račun i evidentira plaćanje.
                   </p>
                 </div>
@@ -239,26 +257,25 @@ function getServiceIcon(service: string) {
 onMounted(() => {
     fetchServices()
 })
-
-
 </script>
+
 <style scoped>
-  #hero {
-    background-image: 
+#hero {
+  background-image: 
     linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),
     url('/images/customers/landingHero3.jpg');
-    background-size: cover;
-    background-position: center;
-}
-
-.services-hero {
-  background:
-    linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),
-    radial-gradient(circle at top right, rgba(13, 110, 253, 0.45), transparent 35%);
+  background-size: cover;
+  background-position: center;
 }
 
 .min-vh-50 {
   min-height: 50vh;
+}
+
+.app-card {
+  background-color: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  color: var(--bs-body-color);
 }
 
 .service-card {
@@ -279,12 +296,8 @@ onMounted(() => {
   place-items: center;
   font-size: 2rem;
   border-radius: 18px;
-  background-color: #f1f5f9;
-}
-
-.info-box {
-  background-color: #ffffff;
-  border: 1px solid #e9ecef;
+  background-color: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
 }
 
 .process-item {
@@ -292,7 +305,7 @@ onMounted(() => {
   gap: 1rem;
   padding-bottom: 1.25rem;
   margin-bottom: 1.25rem;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--bs-border-color);
 }
 
 .process-number {

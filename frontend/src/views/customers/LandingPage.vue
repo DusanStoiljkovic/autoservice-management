@@ -1,5 +1,5 @@
 <template>
-  <div class="landing-page">
+  <div class="landing-page bg-body text-body">
     <main>
       <div
         id="customerCarousel"
@@ -32,7 +32,7 @@
         </div>
 
         <div class="carousel-inner">
-          <div id="carousel1" class="carousel-item active carousel-bg carousel-bg-primary">
+          <div id="carousel1" class="carousel-item active carousel-bg">
             <div class="container">
               <div class="carousel-caption text-start">
                 <span class="badge text-bg-primary mb-3">
@@ -55,7 +55,7 @@
             </div>
           </div>
 
-          <div id="carousel2" class="carousel-item carousel-bg carousel-bg-secondary">
+          <div id="carousel2" class="carousel-item carousel-bg">
             <div class="container">
               <div class="carousel-caption">
                 <span class="badge text-bg-light mb-3">
@@ -78,7 +78,7 @@
             </div>
           </div>
 
-          <div id="carousel3" class="carousel-item carousel-bg carousel-bg-dark">
+          <div id="carousel3" class="carousel-item carousel-bg">
             <div class="container">
               <div class="carousel-caption text-end">
                 <span class="badge text-bg-success mb-3">
@@ -143,7 +143,7 @@
             </p>
 
             <p>
-              <RouterLink class="btn btn-secondary" to="/services">
+              <RouterLink class="btn btn-outline-primary" to="/services">
                 Pogledaj detalje »
               </RouterLink>
             </p>
@@ -161,7 +161,7 @@
               </span>
             </h2>
 
-            <p class="lead">
+            <p class="lead text-body-secondary">
               Klijenti mogu online da pošalju zahtev za servis unosom osnovnih
               podataka o vozilu i kontakt informacija.
             </p>
@@ -171,7 +171,7 @@
             <div class="featurette-box">
               <div class="featurette-emoji">📅</div>
               <h5>Online zakazivanje</h5>
-              <p class="text-muted mb-0">
+              <p class="text-body-secondary mb-0">
                 Izaberite odgovarajuću uslugu i pošaljite zahtev za nekoliko minuta.
               </p>
             </div>
@@ -189,7 +189,7 @@
               </span>
             </h2>
 
-            <p class="lead">
+            <p class="lead text-body-secondary">
               Klijenti mogu da vide dostupne usluge i razumeju šta auto servis
               nudi pre zakazivanja termina.
             </p>
@@ -199,7 +199,7 @@
             <div class="featurette-box">
               <div class="featurette-emoji">🛠️</div>
               <h5>Pregled usluga</h5>
-              <p class="text-muted mb-0">
+              <p class="text-body-secondary mb-0">
                 Zamena ulja, dijagnostika, kočnice, popravke i još mnogo toga.
               </p>
             </div>
@@ -217,7 +217,7 @@
               </span>
             </h2>
 
-            <p class="lead">
+            <p class="lead text-body-secondary">
               Customer landing strana se prirodno povezuje sa dashboard-om za
               majstora, terminima, radnim nalozima i fakturama.
             </p>
@@ -227,7 +227,7 @@
             <div class="featurette-box">
               <div class="featurette-emoji">🚗</div>
               <h5>Servis vozila</h5>
-              <p class="text-muted mb-0">
+              <p class="text-body-secondary mb-0">
                 Od zakazivanja termina do radnog naloga i konačnog računa.
               </p>
             </div>
@@ -236,19 +236,6 @@
 
         <hr class="featurette-divider" />
       </div>
-
-      <footer class="container pb-4">
-        <p class="float-end">
-          <a href="#">Nazad na vrh</a>
-        </p>
-
-        <p>
-          © 2026 AutoService Management ·
-          <a href="#">Privatnost</a>
-          ·
-          <a href="#">Uslovi korišćenja</a>
-        </p>
-      </footer>
     </main>
   </div>
 </template>
@@ -280,20 +267,19 @@ const mainServices = [
 
 <style scoped>
 #carousel1 {
-    background-image: url('/images/customers/landingHero.jpg');
-    background-size: cover;
+  background-image: url('/images/customers/landingHero.jpg');
+  background-size: cover;
 }
 
 #carousel2 {
-    background-image: url('/images/customers/landingHero2.jpg');
-    background-size: cover;
+  background-image: url('/images/customers/landingHero2.jpg');
+  background-size: cover;
 }
 
 #carousel3 {
-    background-image: url('/images/customers/landingHero3.jpg');
-    background-size: cover;
+  background-image: url('/images/customers/landingHero3.jpg');
+  background-size: cover;
 }
-
 
 .carousel {
   margin-bottom: 4rem;
@@ -311,10 +297,12 @@ const mainServices = [
 .carousel-caption h1 {
   font-size: clamp(2.25rem, 5vw, 4.5rem);
   font-weight: 700;
+  color: white;
 }
 
 .carousel-caption p {
   font-size: 1.25rem;
+  color: white;
   max-width: 620px;
 }
 
@@ -331,6 +319,7 @@ const mainServices = [
   position: relative;
   background-size: cover;
   background-position: center;
+  background-color: var(--bs-dark);
 }
 
 .carousel-bg::before {
@@ -338,20 +327,8 @@ const mainServices = [
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.75)),
+    linear-gradient(rgba(15, 23, 42, 0.68), rgba(15, 23, 42, 0.78)),
     radial-gradient(circle at top right, rgba(13, 110, 253, 0.45), transparent 35%);
-}
-
-.carousel-bg-primary {
-  background: linear-gradient(135deg, #111827, #1d4ed8);
-}
-
-.carousel-bg-secondary {
-  background: linear-gradient(135deg, #1f2937, #475569);
-}
-
-.carousel-bg-dark {
-  background: linear-gradient(135deg, #020617, #14532d);
 }
 
 .marketing .col-lg-4 {
@@ -366,12 +343,14 @@ const mainServices = [
   place-items: center;
   border-radius: 50%;
   font-size: 4rem;
-  background-color: #f1f5f9;
-  border: 1px solid #e5e7eb;
+  background-color: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
 }
 
 .featurette-divider {
   margin: 5rem 0;
+  border-color: var(--bs-border-color);
+  opacity: 1;
 }
 
 .featurette-heading {
@@ -388,8 +367,9 @@ const mainServices = [
   padding: 2rem;
   text-align: center;
   border-radius: 24px;
-  background-color: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background-color: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
+  color: var(--bs-body-color);
 }
 
 .featurette-emoji {

@@ -1,5 +1,5 @@
 <template>
-  <main class="book-appointment-page bg-light">
+  <main class="book-appointment-page bg-body-tertiary text-body">
     <section id="hero" class="booking-hero text-white">
       <div class="container py-5">
         <div class="row align-items-center min-vh-40">
@@ -32,7 +32,7 @@
 
         <div class="row g-5">
           <div class="col-md-5 col-lg-4 order-md-last">
-            <div class="card border-0 shadow-sm rounded-4 sticky-summary">
+            <div class="card app-card shadow-sm rounded-4 sticky-summary">
               <div class="card-body p-4">
                 <h4 class="d-flex justify-content-between align-items-center mb-3">
                   <span class="text-primary">Pregled termina</span>
@@ -83,7 +83,7 @@
                   </li>
                 </ul>
 
-                <div class="small text-muted">
+                <div class="small text-body-secondary">
                   Nakon slanja forme, vaš termin će biti kreiran sa statusom
                   <strong>ZAKAZANO</strong>.
                 </div>
@@ -92,7 +92,7 @@
           </div>
 
           <div class="col-md-7 col-lg-8">
-            <div class="card border-0 shadow-sm rounded-4">
+            <div class="card app-card shadow-sm rounded-4">
               <div class="card-body p-4 p-md-5">
                 <h4 class="mb-3">
                   Podaci o klijentu
@@ -295,7 +295,7 @@
                         Slobodni termini
                       </label>
 
-                      <div v-if="appointmentsLoading" class="text-muted">
+                      <div v-if="appointmentsLoading" class="text-body-secondary">
                         Učitavanje termina...
                       </div>
 
@@ -367,6 +367,7 @@
     </section>
   </main>
 </template>
+
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import type { Service } from '@/types/services'
@@ -429,7 +430,7 @@ const form = reactive({
 
 const activeServices = computed(() => {
   return services.value.filter((service) => {
-    return  service.isActive === 1
+    return service.isActive === 1
   })
 })
 
@@ -450,7 +451,7 @@ const appointmentPreview = computed(() => {
     return 'Vreme nije izabrano'
   }
 
-  return `${form.appointmentDate} at ${form.appointmentTime}`
+  return `${form.appointmentDate} u ${form.appointmentTime}`
 })
 
 const occupiedTimesForSelectedDate = computed(() => {
@@ -482,13 +483,13 @@ async function loadServices() {
     const response = await fetch(`${API_URL}/services/all`)
 
     if (!response.ok) {
-      throw new Error('Failed to load services')
+      throw new Error('Neuspešno učitavanje usluga')
     }
 
     services.value = await response.json()
   } catch (error) {
     console.error(error)
-    errorMessage.value = 'Could not load services. Please try again later.'
+    errorMessage.value = 'Usluge trenutno ne mogu da se učitaju. Pokušajte ponovo kasnije.'
   } finally {
     servicesLoading.value = false
   }
@@ -501,13 +502,13 @@ async function loadAppointments() {
     const response = await fetch(`${API_URL}/appointments/all`)
 
     if (!response.ok) {
-      throw new Error('Failed to load appointments')
+      throw new Error('Neuspešno učitavanje termina')
     }
 
     appointments.value = await response.json()
   } catch (error) {
     console.error(error)
-    errorMessage.value = 'Could not load appointment slots. Please try again later.'
+    errorMessage.value = 'Termini trenutno ne mogu da se učitaju. Pokušajte ponovo kasnije.'
   } finally {
     appointmentsLoading.value = false
   }
@@ -520,19 +521,19 @@ async function submitAppointment() {
     successMessage.value = ''
 
     if (!API_URL) {
-      throw new Error('VITE_API_URL is missing in frontend .env file.')
+      throw new Error('VITE_API_URL nedostaje u frontend .env fajlu.')
     }
 
     if (!selectedService.value) {
-      throw new Error('Please choose a service.')
+      throw new Error('Molimo vas da izaberete uslugu.')
     }
 
     if (!form.appointmentTime) {
-      throw new Error('Please choose an available appointment time.')
+      throw new Error('Molimo vas da izaberete slobodan termin.')
     }
 
     if (isSlotOccupied(form.appointmentTime)) {
-      throw new Error('This appointment time is already taken.')
+      throw new Error('Ovaj termin je već zauzet.')
     }
 
     const customer = await Post<CustomerResponse>('/customers/create', {
@@ -564,7 +565,7 @@ async function submitAppointment() {
       problemDescription: form.problemDescription || null,
     })
 
-    successMessage.value = 'Appointment request has been created successfully.'
+    successMessage.value = 'Zahtev za termin je uspešno kreiran.'
 
     await loadAppointments()
 
@@ -577,7 +578,7 @@ async function submitAppointment() {
       return
     }
 
-    errorMessage.value = 'Could not create appointment. Please try again.'
+    errorMessage.value = 'Termin nije moguće kreirati. Pokušajte ponovo.'
   } finally {
     submitting.value = false
   }
@@ -595,7 +596,7 @@ async function Post<T = unknown>(path: string, body: unknown): Promise<T> {
   const data = await response.json().catch(() => null)
 
   if (!response.ok) {
-    throw new Error(data?.message || 'Request failed.')
+    throw new Error(data?.message || 'Zahtev nije uspešno obrađen.')
   }
 
   return data as T
@@ -681,21 +682,21 @@ onMounted(() => {
 
 <style scoped>
 #hero {
-    background-image: 
+  background-image: 
     linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),
     url('/images/customers/landingHero3.jpg');
-    background-size: cover;
-    background-position: center;
-}
-
-.booking-hero {
-  background:
-    linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),
-    radial-gradient(circle at top right, rgba(13, 110, 253, 0.45), transparent 35%);
+  background-size: cover;
+  background-position: center;
 }
 
 .min-vh-40 {
   min-height: 40vh;
+}
+
+.app-card {
+  background-color: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  color: var(--bs-body-color);
 }
 
 .sticky-summary {
@@ -706,10 +707,23 @@ onMounted(() => {
 .form-control,
 .form-select {
   min-height: 46px;
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border-color: var(--bs-border-color);
+}
+
+.form-control::placeholder {
+  color: var(--bs-secondary-color);
 }
 
 textarea.form-control {
   min-height: 120px;
+}
+
+.list-group-item {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border-color: var(--bs-border-color);
 }
 
 .time-slots {
@@ -720,6 +734,17 @@ textarea.form-control {
 
 .time-slot-btn {
   min-width: 90px;
+}
+
+.time-slot-btn.btn-outline-secondary {
+  background-color: var(--bs-tertiary-bg);
+  border-color: var(--bs-border-color);
+  color: var(--bs-secondary-color);
+}
+
+hr {
+  border-color: var(--bs-border-color);
+  opacity: 1;
 }
 
 @media (max-width: 768px) {

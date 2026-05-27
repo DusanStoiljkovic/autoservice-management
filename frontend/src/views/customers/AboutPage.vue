@@ -1,5 +1,5 @@
 <template>
-  <main class="about-page">
+  <main class="about-page bg-body text-body">
     <section id="hero" class="about-hero text-white">
       <div class="container py-5">
         <div class="row align-items-center min-vh-40">
@@ -21,7 +21,7 @@
       </div>
     </section>
 
-    <section class="py-5 bg-light">
+    <section class="py-5 bg-body-tertiary">
       <div class="container">
         <div class="row align-items-center g-5">
           <div class="col-lg-6">
@@ -29,13 +29,13 @@
               Ko smo mi?
             </h2>
 
-            <p class="text-muted">
+            <p class="text-body-secondary">
               AutoService je moderan auto servis koji omogućava klijentima da brzo
               zakažu termin, izaberu potrebnu uslugu i dobiju jasne informacije o
               procesu servisiranja.
             </p>
 
-            <p class="text-muted">
+            <p class="text-body-secondary">
               Fokusirani smo na kvalitetnu dijagnostiku, redovno održavanje,
               transparentan rad i dobru komunikaciju sa klijentima.
             </p>
@@ -46,7 +46,7 @@
           </div>
 
           <div class="col-lg-6">
-            <div class="about-card rounded-4 shadow-sm p-4">
+            <div class="app-card rounded-4 shadow-sm p-4">
               <h5 class="fw-bold mb-4">
                 Zašto klijenti biraju nas?
               </h5>
@@ -60,7 +60,7 @@
                   <h6 class="fw-bold mb-1">
                     Iskusni majstori
                   </h6>
-                  <p class="text-muted mb-0">
+                  <p class="text-body-secondary mb-0">
                     Vaše vozilo pregledaju i servisiraju stručni automehaničari.
                   </p>
                 </div>
@@ -75,7 +75,7 @@
                   <h6 class="fw-bold mb-1">
                     Jednostavno zakazivanje
                   </h6>
-                  <p class="text-muted mb-0">
+                  <p class="text-body-secondary mb-0">
                     Termin možete zakazati online bez pozivanja servisa.
                   </p>
                 </div>
@@ -90,7 +90,7 @@
                   <h6 class="fw-bold mb-1">
                     Pregledan proces
                   </h6>
-                  <p class="text-muted mb-0">
+                  <p class="text-body-secondary mb-0">
                     Od prijema vozila do računa, sve je organizovano i jasno.
                   </p>
                 </div>
@@ -101,21 +101,21 @@
       </div>
     </section>
 
-    <section class="py-5">
+    <section class="py-5 bg-body">
       <div class="container">
         <div class="text-center mb-5">
           <h2 class="fw-bold">
             Naše vrednosti
           </h2>
 
-          <p class="text-muted mb-0">
+          <p class="text-body-secondary mb-0">
             Trudimo se da svaki klijent dobije profesionalnu i poštenu uslugu.
           </p>
         </div>
 
         <div class="row g-4">
           <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm rounded-4">
+            <div class="card app-card h-100 shadow-sm rounded-4">
               <div class="card-body p-4 text-center">
                 <div class="value-icon mb-3">
                   ✅
@@ -125,7 +125,7 @@
                   Pouzdanost
                 </h5>
 
-                <p class="text-muted mb-0">
+                <p class="text-body-secondary mb-0">
                   Poštujemo dogovorene termine i jasno komuniciramo stanje vozila.
                 </p>
               </div>
@@ -133,7 +133,7 @@
           </div>
 
           <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm rounded-4">
+            <div class="card app-card h-100 shadow-sm rounded-4">
               <div class="card-body p-4 text-center">
                 <div class="value-icon mb-3">
                   🔍
@@ -143,7 +143,7 @@
                   Transparentnost
                 </h5>
 
-                <p class="text-muted mb-0">
+                <p class="text-body-secondary mb-0">
                   Klijent zna koja usluga se radi i šta je potrebno popraviti.
                 </p>
               </div>
@@ -151,7 +151,7 @@
           </div>
 
           <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm rounded-4">
+            <div class="card app-card h-100 shadow-sm rounded-4">
               <div class="card-body p-4 text-center">
                 <div class="value-icon mb-3">
                   🚗
@@ -161,7 +161,7 @@
                   Kvalitet
                 </h5>
 
-                <p class="text-muted mb-0">
+                <p class="text-body-secondary mb-0">
                   Koristimo proverene metode rada i pažljivo pristupamo svakom vozilu.
                 </p>
               </div>
@@ -178,27 +178,22 @@ import { RouterLink } from 'vue-router'
 </script>
 
 <style scoped>
-
 #hero {
-    background-image: 
+  background-image: 
     linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),
     url('/images/customers/landingHero2.jpg');
-    background-size: cover;
-}
-
-.about-hero {
-  background:
-    linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),
-    radial-gradient(circle at top right, rgba(13, 110, 253, 0.45), transparent 35%);
+  background-size: cover;
+  background-position: center;
 }
 
 .min-vh-40 {
   min-height: 40vh;
 }
 
-.about-card {
-  background-color: #ffffff;
-  border: 1px solid #e9ecef;
+.app-card {
+  background-color: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  color: var(--bs-body-color);
 }
 
 .about-item {
@@ -206,7 +201,7 @@ import { RouterLink } from 'vue-router'
   gap: 1rem;
   padding-bottom: 1.25rem;
   margin-bottom: 1.25rem;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--bs-border-color);
 }
 
 .about-icon {
@@ -217,7 +212,8 @@ import { RouterLink } from 'vue-router'
   place-items: center;
   border-radius: 14px;
   font-size: 1.5rem;
-  background-color: #f1f5f9;
+  background-color: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
 }
 
 .value-icon {

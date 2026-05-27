@@ -1,5 +1,5 @@
 <template>
-  <main class="contact-page">
+  <main class="contact-page bg-body text-body">
     <section id="hero" class="contact-hero text-white">
       <div class="container py-5">
         <div class="row align-items-center min-vh-40">
@@ -21,11 +21,11 @@
       </div>
     </section>
 
-    <section class="py-5 bg-light">
+    <section class="py-5 bg-body-tertiary">
       <div class="container">
         <div class="row g-5">
           <div class="col-lg-5">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card app-card shadow-sm rounded-4 h-100">
               <div class="card-body p-4">
                 <h4 class="fw-bold mb-4">
                   Informacije
@@ -40,7 +40,7 @@
                     <h6 class="fw-bold mb-1">
                       Adresa
                     </h6>
-                    <p class="text-muted mb-0">
+                    <p class="text-body-secondary mb-0">
                       Ulica Auto Servisa 12, Beograd
                     </p>
                   </div>
@@ -55,7 +55,7 @@
                     <h6 class="fw-bold mb-1">
                       Telefon
                     </h6>
-                    <p class="text-muted mb-0">
+                    <p class="text-body-secondary mb-0">
                       +381 60 123 4567
                     </p>
                   </div>
@@ -70,7 +70,7 @@
                     <h6 class="fw-bold mb-1">
                       Email
                     </h6>
-                    <p class="text-muted mb-0">
+                    <p class="text-body-secondary mb-0">
                       autoservice@example.com
                     </p>
                   </div>
@@ -85,7 +85,7 @@
                     <h6 class="fw-bold mb-1">
                       Radno vreme
                     </h6>
-                    <p class="text-muted mb-0">
+                    <p class="text-body-secondary mb-0">
                       Ponedeljak - Petak: 08:00 - 16:00
                     </p>
                   </div>
@@ -99,13 +99,13 @@
           </div>
 
           <div class="col-lg-7">
-            <div class="card border-0 shadow-sm rounded-4">
+            <div class="card app-card shadow-sm rounded-4">
               <div class="card-body p-4 p-md-5">
                 <h4 class="fw-bold mb-3">
                   Pošaljite poruku
                 </h4>
 
-                <p class="text-muted mb-4">
+                <p class="text-body-secondary mb-4">
                   Popunite formu, a mi ćemo vam odgovoriti u najkraćem roku.
                 </p>
 
@@ -194,9 +194,7 @@
         </div>
 
         <div class="map-box rounded-4 shadow-sm mt-5">
-          
-
-            <iframe width="100%" height="650px" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?key=AIzaSyB2NIWI3Tv9iDPrlnowr_0ZqZWoAQydKJU&q=Belgrade&maptype=roadmap" allowfullscreen></iframe>
+          <iframe width="100%" height="650px" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?key=AIzaSyB2NIWI3Tv9iDPrlnowr_0ZqZWoAQydKJU&q=Belgrade&maptype=roadmap" allowfullscreen></iframe>
         </div>
       </div>
     </section>
@@ -208,6 +206,8 @@ import { reactive, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 const successMessage = ref('')
+
+const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&q=Belgrade&maptype=roadmap`
 
 const form = reactive({
   fullName: '',
@@ -229,22 +229,22 @@ function sendMessage() {
 </script>
 
 <style scoped>
-
 #hero {
-    background-image: 
+  background-image: 
     linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),
     url('/images/customers/landingHero.jpg');
-    background-size: cover;
-}
-
-.contact-hero {
-  background:
-    linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),
-    radial-gradient(circle at top right, rgba(13, 110, 253, 0.45), transparent 35%);
+  background-size: cover;
+  background-position: center;
 }
 
 .min-vh-40 {
   min-height: 40vh;
+}
+
+.app-card {
+  background-color: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  color: var(--bs-body-color);
 }
 
 .contact-info-item {
@@ -252,7 +252,7 @@ function sendMessage() {
   gap: 1rem;
   padding-bottom: 1.25rem;
   margin-bottom: 1.25rem;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--bs-border-color);
 }
 
 .contact-icon {
@@ -263,11 +263,19 @@ function sendMessage() {
   place-items: center;
   border-radius: 14px;
   font-size: 1.4rem;
-  background-color: #f1f5f9;
+  background-color: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
 }
 
 .form-control {
   min-height: 46px;
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border-color: var(--bs-border-color);
+}
+
+.form-control::placeholder {
+  color: var(--bs-secondary-color);
 }
 
 textarea.form-control {
@@ -275,12 +283,13 @@ textarea.form-control {
 }
 
 .map-box {
-  min-height: 260px;
-  display: grid;
-  place-items: center;
-  padding: 2rem;
-  background-color: #ffffff;
-  border: 1px solid #e9ecef;
+  overflow: hidden;
+  background-color: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+}
+
+.map-box iframe {
+  display: block;
 }
 
 .map-icon {

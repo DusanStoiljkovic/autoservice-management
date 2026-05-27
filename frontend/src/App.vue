@@ -1,11 +1,23 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import Navbar from './views/components/Navbar.vue';
+import Navbar from './views/components/Navbar.vue'
+import Footer from './views/components/Footer.vue'
 </script>
 
 <template>
-<Navbar/>
-<RouterView/>
+  <div class="app-layout min-vh-100 d-flex flex-column bg-body text-body">
+    <Navbar />
+
+    <main class="flex-grow-1">
+      <RouterView />
+    </main>
+
+    <Footer class="mt-5" />
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.app-layout {
+  width: 100%;
+}
+</style>
