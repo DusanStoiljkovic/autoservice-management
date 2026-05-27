@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import Sidebar from '../components/Sidebar.vue'
 import type { Customer } from '@/types/customer.ts'
@@ -12,28 +12,52 @@ const allAppointments = ref<any[]>([])
 const workingOrders = ref<any[]>([])
 const invoices = ref<any[]>([])
 
-const stats = [
-  {
-    title: 'Klijenti',
-    value: 128,
-    icon: 'bi bi-people'
-  },
+const API_BASE_URL = import.meta.env.VITE_API_URL
+async function fetchData() {
+  try {
+    const [customersRes, vehiclesRes, servicesRes, appointmentsRes, workingOrdersRes, invoicesRes] = await Promise.all([
+      axios.get(`${API_BASE_URL}/customers/all`),
+      axios.get(`${API_BASE_URL}/vehicles/all`),
+      axios.get(`${API_BASE_URL}/services/all`),
+      axios.get(`${API_BASE_URL}/appointments/all`),
+      axios.get(`${API_BASE_URL}/repair-orders/all`),
+      axios.get(`${API_BASE_URL}/invoices/all`)
+    ])
+
+    customers.value = customersRes.data
+    vehicles.value = vehiclesRes.data
+    services.value = servicesRes.data
+    allAppointments.value = appointmentsRes.data
+    workingOrders.value = workingOrdersRes.data
+    invoices.value = invoicesRes.data
+  } catch (error) {
+    console.error('Greška prilikom učitavanja podataka:', error)
+  }
+}
+
+const stats = computed(() => {
+  return [
+    {
+      title: 'Klijenti',
+      value: customers.value.length,
+      icon: 'bi bi-people'
+    },
   {
     title: 'Vozila',
-    value: 214,
+    value: vehicles.value.length,
     icon: 'bi bi-car-front'
   },
   {
     title: 'Današnji termini',
-    value: 8,
+    value: allAppointments.value.length,
     icon: 'bi bi-calendar-event'
   },
   {
     title: 'Otvoreni nalozi',
-    value: 5,
+    value: workingOrders.value.length,
     icon: 'bi bi-clipboard-check'
   }
-]
+]})
 
 const appointments = [
   {
@@ -70,6 +94,10 @@ function getStatusClass(status: string) {
 
   return 'text-bg-primary'
 }
+
+onMounted( async() => {
+  await fetchData()
+})
 </script>
 
 <template>

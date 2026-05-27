@@ -10,6 +10,7 @@ export class OrderService {
     return await this.repo.find({
       select: {
         services: {
+          id: true,
           name: true,
           price: true,
         },
