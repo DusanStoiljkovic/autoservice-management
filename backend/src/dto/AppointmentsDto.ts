@@ -4,8 +4,7 @@ export interface CreateAppointmentDto {
   scheduledAt: string
   problemDescription?: string
   description?: string
-  customerNote?: string | null
-  serviceType?: string
+  serviceIds?: number[]
 }
 
 export interface AppointmentResponse {

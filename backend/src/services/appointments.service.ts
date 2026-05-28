@@ -87,12 +87,27 @@ export class AppointmentService {
       throw new Error("Appointment term is already taken.")
     }
 
+    if (!dto.serviceIds || dto.serviceIds.length === 0) {
+      throw new Error("At least one service must be selected.")
+    }
+
+    const services = await AppDataSource.getRepository("Service").findBy(
+      {
+        id: In(dto.serviceIds),
+      }
+    )
+
+    if (services.length !== dto.serviceIds.length) {
+      throw new Error("One or more selected services are invalid.")
+    }
+
     const appointment = this.repo.create({
       customerId: dto.customerId,
       vehicleId: dto.vehicleId,
       scheduledAt,
       status: AppointmentStatus.SCHEDULED,
       description: dto.problemDescription ?? dto.description ?? "",
+      services,
     })
 
     return await this.repo.save(appointment)
