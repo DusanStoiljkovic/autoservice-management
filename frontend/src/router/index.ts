@@ -9,6 +9,7 @@ import ContactPage from '../views/customers/ContactPage.vue'
 import LoginPage from '../views/auth/LoginPage.vue'
 import RegisterPage from '../views/auth/RegisterPage.vue'
 import DashboardLayout from '../views/auth/DashboardLayout.vue'
+import AppointmentDetailsLayout from '../views/auth/AppointmentDetailsLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -53,6 +54,11 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: DashboardLayout
+    },
+    {
+      path: '/dashboard/appointments/:id',
+      name: 'appointment-details',
+      component: AppointmentDetailsLayout
     },
     {
       path: '/:pathMatch(.*)*',

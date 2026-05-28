@@ -10,6 +10,10 @@ export class AppointmentService {
 
   static async getAll(query: any) {
     const queryBuilder = this.repo.createQueryBuilder("appointment")
+      .leftJoinAndSelect("appointment.customer", "customer")
+      .leftJoinAndSelect("appointment.vehicle", "vehicle")
+      .leftJoinAndSelect("appointment.repairOrders", "repairOrders")
+
     if (query.status) {
       queryBuilder.andWhere("appointment.status = :status", { status: query.status })
     }
@@ -26,6 +30,8 @@ export class AppointmentService {
       queryBuilder.andWhere("appointment.vehicleId = :vehicleId", { vehicleId: query.vehicleId })
     }
 
+    queryBuilder.orderBy("appointment.scheduledAt", "DESC")
+
     return await queryBuilder.getMany()
   }
 
@@ -34,6 +40,8 @@ export class AppointmentService {
       where: { id },
       relations: {
         repairOrders: true,
+        customer: true,
+        vehicle: true,
       },
     })
 

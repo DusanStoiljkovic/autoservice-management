@@ -2,12 +2,14 @@ import {
   Column,
   Entity,
   Index,
+  JoinTable,
   ManyToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 
 import type { Relation } from "typeorm";
 import { RepairOrders } from "./RepairOrders";
+import { Appointments } from "./Appointments";
 
 @Index("idx_services_is_active", ["isActive"], {})
 @Entity("services", { schema: "auto_service_management" })
@@ -47,6 +49,7 @@ export class Services {
   })
   updatedAt: Date;
 
-  @ManyToMany(() => RepairOrders, (repairOrder) => repairOrder.services)
-  repairOrders: Relation<RepairOrders[]>;
+  @ManyToMany(() => Appointments, (appointment) => appointment.services)
+  appointments: Relation<Appointments[]>;
+  
 }

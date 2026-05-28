@@ -11,6 +11,8 @@ const services = ref<Service[]>([])
 const allAppointments = ref<any[]>([])
 const workingOrders = ref<any[]>([])
 const invoices = ref<any[]>([])
+const selectedStatus = ref('SCHEDULED')
+const selectedPeriod = ref('today')
 
 const API_BASE_URL = import.meta.env.VITE_API_URL
 async function fetchData() {
@@ -19,7 +21,7 @@ async function fetchData() {
       axios.get(`${API_BASE_URL}/customers/all`),
       axios.get(`${API_BASE_URL}/vehicles/all`),
       axios.get(`${API_BASE_URL}/services/all`),
-      axios.get(`${API_BASE_URL}/appointments/all`),
+      axios.get(`${API_BASE_URL}/appointments/all?status=${selectedStatus.value}&dateFrom=${getDateFrom(selectedPeriod.value)}&dateTo=${getDateTo(selectedPeriod.value)}`),
       axios.get(`${API_BASE_URL}/repair-orders/all`),
       axios.get(`${API_BASE_URL}/invoices/all`)
     ])
@@ -70,6 +72,96 @@ function getStatusClass(status: string) {
 
   return 'text-bg-primary'
 }
+
+function getDateFrom(period: string) {
+  const now = new Date()
+  const dateFrom = new Date(now)
+
+  if (period === 'today') {
+    dateFrom.setHours(0, 0, 0, 0)
+    return new Date(dateFrom).toISOString()
+  }
+
+  if (period === 'week') {
+    const dayOfWeek = now.getDay() || 7
+
+    dateFrom.setDate(now.getDate() - dayOfWeek + 1)
+    dateFrom.setHours(0, 0, 0, 0)
+
+    return new Date(dateFrom).toISOString()
+  }
+
+  if (period === 'month') {
+    dateFrom.setDate(1)
+    dateFrom.setHours(0, 0, 0, 0)
+
+    return new Date(dateFrom).toISOString()
+  }
+
+  if(period === 'nextmonth') {
+    dateFrom.setMonth(now.getMonth() + 1)
+    dateFrom.setDate(1)
+    dateFrom.setHours(0, 0, 0, 0)
+
+    return new Date(dateFrom).toISOString()
+  }
+
+  if (period === 'all') {
+    dateFrom.setFullYear(2000)
+    dateFrom.setHours(0, 0, 0, 0)
+
+    return new Date(dateFrom).toISOString()
+  }
+
+  dateFrom.setHours(0, 0, 0, 0)
+  return new Date(dateFrom).toISOString()
+}
+
+function getDateTo(period: string) {
+  const now = new Date()
+  const dateTo = new Date(now)
+
+  if (period === 'today') {
+    dateTo.setHours(23, 59, 59, 999)
+    return new Date(dateTo).toISOString()
+  }
+
+  if (period === 'week') {
+    const dayOfWeek = now.getDay() || 7
+
+    dateTo.setDate(now.getDate() + dayOfWeek - 6)
+    dateTo.setHours(23, 59, 59, 999)
+
+    return new Date(dateTo).toISOString()
+  }
+
+  if (period === 'month') {
+    dateTo.setMonth(now.getMonth() + 1)
+    dateTo.setDate(0)
+    dateTo.setHours(23, 59, 59, 999)
+
+    return new Date(dateTo).toISOString()
+  }
+
+  if(period === 'nextmonth') {
+    dateTo.setMonth(now.getMonth() + 2)
+    dateTo.setDate(0)
+    dateTo.setHours(23, 59, 59, 999)
+
+    return new Date(dateTo).toISOString()
+  } 
+
+  if (period === 'all') {
+    dateTo.setFullYear(2100)
+    dateTo.setHours(23, 59, 59, 999)
+
+    return new Date(dateTo).toISOString()
+  }
+  
+  dateTo.setHours(23, 59, 59, 999)
+  return new Date(dateTo).toISOString()
+}
+
 
 onMounted( async() => {
   await fetchData()
@@ -145,6 +237,21 @@ onMounted( async() => {
                     Pregled zakazanih termina za danas.
                   </p>
                 </div>
+                <div class="d-flex gap-2">
+                  <select class="form-select"  aria-label="status" v-model="selectedStatus" @change="fetchData">
+                    <option value="SCHEDULED">Zakazani</option>
+                    <option value="CONFIRMED">Potvrđeni</option>
+                    <option value="COMPLETED">Završeni</option>
+                  </select>
+
+                  <select class="form-select" aria-label="Period" v-model="selectedPeriod" @change="fetchData">
+                    <option value="today">Danas</option>
+                    <option value="week">Ove nedelje</option>
+                    <option value="month">Ceo mesec</option>
+                    <option value="nextmonth">Sledeći mesec</option>
+                    <option value="all">Svi</option>
+                  </select>
+                </div>
               </div>
 
               <div class="table-responsive">
@@ -162,10 +269,11 @@ onMounted( async() => {
                     <tr
                       v-for="appointment in allAppointments"
                       :key="appointment.id"
+                      @click="() => $router.push(`/dashboard/appointments/${appointment.id}`)"
                     >
-                      <td>{{ appointment.time }}</td>
-                      <td>{{ appointment.customer.Id }}</td>
-                      <td>{{ appointment.vehicle }}</td>
+                      <td>{{ Intl.DateTimeFormat('sr-RS', {hour: '2-digit', minute: '2-digit'}).format(new Date(appointment.scheduledAt)) }}</td>
+                      <td>{{ appointment.customer.firstName }} {{ appointment.customer.lastName }}</td>
+                      <td>{{ appointment.vehicle.make }} {{  appointment.vehicle.model }}</td>
                       <td>
                         <span class="badge" :class="getStatusClass(appointment.status)">
                           {{ appointment.status }}

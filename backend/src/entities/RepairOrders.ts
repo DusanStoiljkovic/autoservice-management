@@ -109,18 +109,4 @@ export class RepairOrders {
   })
   @JoinColumn([{ name: "vehicle_id", referencedColumnName: "id" }])
   vehicle: Vehicles;
-
-  @ManyToMany(() => Services, (service) => service.repairOrders)
-  @JoinTable({
-    name: "repair_order_services",
-    joinColumn: {
-      name: "repair_order_id",
-      referencedColumnName: "id",
-    },
-    inverseJoinColumn: {
-      name: "service_id",
-      referencedColumnName: "id",
-    },
-  })
-  services: Relation<Services[]>;
 }

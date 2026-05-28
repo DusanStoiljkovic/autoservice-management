@@ -3,6 +3,8 @@ import {
   Entity,
   Index,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -11,6 +13,7 @@ import { Customers } from "./Customers";
 import { Vehicles } from "./Vehicles";
 import { RepairOrders } from "./RepairOrders";
 import type { Relation } from "typeorm";
+import { Services } from "./Services";
 
 export enum AppointmentStatus {
   SCHEDULED = "SCHEDULED",
@@ -75,4 +78,18 @@ export class Appointments {
 
   @OneToOne(() => RepairOrders, (repairOrders) => repairOrders.appointment)
   repairOrders: Relation<RepairOrders>;
+
+  @ManyToMany(() => Services, (service) => service.appointments)
+  @JoinTable({
+    name: "appointment_services",
+    joinColumn: {
+      name: "service_id",
+      referencedColumnName: "id",
+    },
+    inverseJoinColumn: {
+      name: "service_id",
+      referencedColumnName: "id",
+    },
+  })
+  services: Relation<RepairOrders[]>;
 }
