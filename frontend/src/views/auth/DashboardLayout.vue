@@ -8,28 +8,49 @@ import type { Service } from '@/types/services.ts'
 const customers = ref<Customer[]>([])
 const vehicles = ref<any[]>([])
 const services = ref<Service[]>([])
+const showAppointments = ref<any[]>([])
 const allAppointments = ref<any[]>([])
 const workingOrders = ref<any[]>([])
 const invoices = ref<any[]>([])
+
 const selectedStatus = ref('SCHEDULED')
 const selectedPeriod = ref('today')
 
 const API_BASE_URL = import.meta.env.VITE_API_URL
+
 async function fetchData() {
   try {
-    const [customersRes, vehiclesRes, servicesRes, appointmentsRes, workingOrdersRes, invoicesRes] = await Promise.all([
+    const [
+      customersRes,
+      vehiclesRes,
+      servicesRes,
+      showAppointmentsRes,
+      allAppointmentsRes,
+      workingOrdersRes,
+      invoicesRes
+    ] = await Promise.all([
       axios.get(`${API_BASE_URL}/customers/all`),
       axios.get(`${API_BASE_URL}/vehicles/all`),
       axios.get(`${API_BASE_URL}/services/all`),
-      axios.get(`${API_BASE_URL}/appointments/all?status=${selectedStatus.value}&dateFrom=${getDateFrom(selectedPeriod.value)}&dateTo=${getDateTo(selectedPeriod.value)}`),
-      axios.get(`${API_BASE_URL}/repair-orders/all`),
+
+      axios.get(
+        `${API_BASE_URL}/appointments/all?status=${selectedStatus.value}&dateFrom=${getDateFrom(selectedPeriod.value)}&dateTo=${getDateTo(selectedPeriod.value)}`
+      ),
+
+      axios.get(`${API_BASE_URL}/appointments/all`),
+
+      axios.get(
+        `${API_BASE_URL}/repair-orders/all?status=IN_PROGRESS`
+      ),
+
       axios.get(`${API_BASE_URL}/invoices/all`)
     ])
 
     customers.value = customersRes.data
     vehicles.value = vehiclesRes.data
     services.value = servicesRes.data
-    allAppointments.value = appointmentsRes.data
+    showAppointments.value = showAppointmentsRes.data
+    allAppointments.value = allAppointmentsRes.data
     workingOrders.value = workingOrdersRes.data
     invoices.value = invoicesRes.data
   } catch (error) {
@@ -37,36 +58,67 @@ async function fetchData() {
   }
 }
 
+const paidInvoices = computed(() => {
+  return invoices.value.filter(invoice => invoice.status === 'PAID')
+})
+
+const unpaidInvoices = computed(() => {
+  return invoices.value.filter(invoice => invoice.status === 'DRAFTED')
+})
+
+const overdueInvoices = computed(() => {
+  return invoices.value.filter(invoice => invoice.status === 'ISSUED')
+})
+
+const totalInvoiceAmount = computed(() => {
+  return invoices.value.reduce((acc, invoice) => {
+    return acc + Number(invoice.total ?? 0)
+  }, 0)
+})
+
+const unpaidInvoiceAmount = computed(() => {
+  return unpaidInvoices.value.reduce((acc, invoice) => {
+    return acc + Number(invoice.total ?? 0)
+  }, 0)
+})
+
 const stats = computed(() => {
   return [
     {
-      title: 'Klijenti',
-      value: customers.value.length,
-      icon: 'bi bi-people'
+      title: 'Zarađeno',
+      value: formatCurrency(totalInvoiceAmount.value),
+      icon: 'bi bi-cash-stack'
     },
-  {
-    title: 'Vozila',
-    value: vehicles.value.length,
-    icon: 'bi bi-car-front'
-  },
-  {
-    title: 'Današnji termini',
-    value: allAppointments.value.length,
-    icon: 'bi bi-calendar-event'
-  },
-  {
-    title: 'Otvoreni nalozi',
-    value: workingOrders.value.length,
-    icon: 'bi bi-clipboard-check'
-  }
-]})
+    {
+      title: 'Ukupno vozila',
+      value: vehicles.value.length,
+      icon: 'bi bi-car-front'
+    },
+    {
+      title: 'Nepotvrđeni termini',
+      value: getNumOfNoCompletedAppointments(),
+      icon: 'bi bi-calendar-event'
+    },
+    {
+      title: 'Otvoreni radni nalozi',
+      value: workingOrders.value.length,
+      icon: 'bi bi-clipboard-check'
+    }
+  ]
+})
+
+function getNumOfNoCompletedAppointments() {
+  return allAppointments.value.filter(
+    app => app.status === 'SCHEDULED'
+  ).length
+}
 
 function getStatusClass(status: string) {
-  if (status === 'Potvrđeno') {
+  if (status === 'CONFIRMED') {
     return 'text-bg-success'
   }
 
-  if (status === 'U toku') {
+  if (status === 'COMPLETED') {
     return 'text-bg-warning'
   }
 
@@ -79,7 +131,7 @@ function getDateFrom(period: string) {
 
   if (period === 'today') {
     dateFrom.setHours(0, 0, 0, 0)
-    return new Date(dateFrom).toISOString()
+    return dateFrom.toISOString()
   }
 
   if (period === 'week') {
@@ -88,33 +140,34 @@ function getDateFrom(period: string) {
     dateFrom.setDate(now.getDate() - dayOfWeek + 1)
     dateFrom.setHours(0, 0, 0, 0)
 
-    return new Date(dateFrom).toISOString()
+    return dateFrom.toISOString()
   }
 
   if (period === 'month') {
     dateFrom.setDate(1)
     dateFrom.setHours(0, 0, 0, 0)
 
-    return new Date(dateFrom).toISOString()
+    return dateFrom.toISOString()
   }
 
-  if(period === 'nextmonth') {
+  if (period === 'nextmonth') {
     dateFrom.setMonth(now.getMonth() + 1)
     dateFrom.setDate(1)
     dateFrom.setHours(0, 0, 0, 0)
 
-    return new Date(dateFrom).toISOString()
+    return dateFrom.toISOString()
   }
 
   if (period === 'all') {
     dateFrom.setFullYear(2000)
     dateFrom.setHours(0, 0, 0, 0)
 
-    return new Date(dateFrom).toISOString()
+    return dateFrom.toISOString()
   }
 
   dateFrom.setHours(0, 0, 0, 0)
-  return new Date(dateFrom).toISOString()
+
+  return dateFrom.toISOString()
 }
 
 function getDateTo(period: string) {
@@ -123,16 +176,17 @@ function getDateTo(period: string) {
 
   if (period === 'today') {
     dateTo.setHours(23, 59, 59, 999)
-    return new Date(dateTo).toISOString()
+
+    return dateTo.toISOString()
   }
 
   if (period === 'week') {
     const dayOfWeek = now.getDay() || 7
 
-    dateTo.setDate(now.getDate() + dayOfWeek - 6)
+    dateTo.setDate(now.getDate() + (7 - dayOfWeek))
     dateTo.setHours(23, 59, 59, 999)
 
-    return new Date(dateTo).toISOString()
+    return dateTo.toISOString()
   }
 
   if (period === 'month') {
@@ -140,30 +194,53 @@ function getDateTo(period: string) {
     dateTo.setDate(0)
     dateTo.setHours(23, 59, 59, 999)
 
-    return new Date(dateTo).toISOString()
+    return dateTo.toISOString()
   }
 
-  if(period === 'nextmonth') {
+  if (period === 'nextmonth') {
     dateTo.setMonth(now.getMonth() + 2)
     dateTo.setDate(0)
     dateTo.setHours(23, 59, 59, 999)
 
-    return new Date(dateTo).toISOString()
-  } 
+    return dateTo.toISOString()
+  }
 
   if (period === 'all') {
     dateTo.setFullYear(2100)
     dateTo.setHours(23, 59, 59, 999)
 
-    return new Date(dateTo).toISOString()
+    return dateTo.toISOString()
   }
-  
+
   dateTo.setHours(23, 59, 59, 999)
-  return new Date(dateTo).toISOString()
+
+  return dateTo.toISOString()
 }
 
+function getWorkingHoursPerVehicle(vehicleId: number) {
+  const appointment = allAppointments.value.find(
+    app => app.vehicle?.id === vehicleId
+  )
 
-onMounted( async() => {
+  if (!appointment?.services) {
+    return 0
+  }
+
+  const workingHours = appointment.services.reduce(
+    (total: number, service: Service) => {
+      return total + (service.estimatedDurationMinutes ?? 0)
+    },
+    0
+  )
+
+  return workingHours
+}
+
+function formatCurrency(value: number) {
+  return `${value.toLocaleString('sr-RS')} RSD`
+}
+
+onMounted(async () => {
   await fetchData()
 })
 </script>
@@ -267,7 +344,7 @@ onMounted( async() => {
 
                   <tbody>
                     <tr
-                      v-for="appointment in allAppointments"
+                      v-for="appointment in showAppointments"
                       :key="appointment.id"
                       @click="() => $router.push(`/dashboard/appointments/${appointment.id}`)"
                     >
@@ -331,6 +408,108 @@ onMounted( async() => {
               <div class="d-flex justify-content-between">
                 <span class="text-body-secondary">Neplaćene fakture</span>
                 <strong>3</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4 mt-2">
+        <div class="col-xl-6">
+          <div class="card dashboard-card shadow-sm rounded-4 h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                  <h5 class="fw-bold mb-1">
+                    Vozila na servisu
+                  </h5>
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Početak</th>
+                      <th>Trajanje</th>
+                      <th>Klijent</th>
+                      <th>Vozilo</th>
+                      <th>Mehaničar</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr
+                      v-for="order in workingOrders"
+                      :key="order.id"
+                      @click="() => $router.push(`/dashboard/repair-orders/${order.id}`)"
+                    >
+                      <td>{{ new Date(order.startedAt).getHours()}}:{{ new Date(order.startedAt).getMinutes() }}</td>
+                      <td>{{ getWorkingHoursPerVehicle(order.vehicle.id) }} min</td>
+                      <td>{{ order.customer.firstName }} {{ order.customer.lastName }}</td>
+                      <td>{{ order.vehicle.make }} {{ order.vehicle.model }}</td>
+                      <td>
+                        <span class="badge" :class="getStatusClass(order.mechanic.status)">
+                          {{ order.mechanic.firstName }} {{ order.mechanic.lastName }}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-6">
+          <div class="card dashboard-card shadow-sm rounded-4 h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                  <h5 class="fw-bold mb-1">
+                    Fakture
+                  </h5>
+
+                  <p class="text-body-secondary mb-0">
+                    Pregled naplate i statusa faktura.
+                  </p>
+                </div>
+
+                <div class="dashboard-icon">
+                  <i class="bi bi-receipt"></i>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-body-secondary">Ukupno faktura</span>
+                <strong>{{ invoices.length }}</strong>
+              </div>
+
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-body-secondary">Plaćene fakture</span>
+                <strong class="text-success">{{ paidInvoices.length }}</strong>
+              </div>
+
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-body-secondary">Neplaćene fakture</span>
+                <strong class="text-warning">{{ unpaidInvoices.length }}</strong>
+              </div>
+
+              <div class="d-flex justify-content-between mb-3">
+                <span class="text-body-secondary">Dospele fakture</span>
+                <strong class="text-danger">{{ overdueInvoices.length }}</strong>
+              </div>
+
+              <hr class="my-4" />
+
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-body-secondary">Ukupan iznos</span>
+                <strong>{{ formatCurrency(totalInvoiceAmount) }}</strong>
+              </div>
+
+              <div class="d-flex justify-content-between">
+                <span class="text-body-secondary">Za naplatu</span>
+                <strong class="text-danger">{{ formatCurrency(unpaidInvoiceAmount) }}</strong>
               </div>
             </div>
           </div>

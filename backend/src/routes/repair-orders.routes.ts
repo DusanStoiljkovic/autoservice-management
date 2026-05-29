@@ -5,7 +5,7 @@ const OrderRoute = Router()
 
 OrderRoute.get("/all", async (req: Request, res: Response) => {
   try {
-    const orders = await OrderService.getAll()
+    const orders = await OrderService.getAll(req.query)
 
     res.json(orders)
   } catch (error) {

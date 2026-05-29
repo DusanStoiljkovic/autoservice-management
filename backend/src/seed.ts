@@ -22,14 +22,15 @@ async function resetDatabase() {
     await queryRunner.query('SET FOREIGN_KEY_CHECKS = 0')
 
     await queryRunner.query('TRUNCATE TABLE invoices')
-    await queryRunner.query('TRUNCATE TABLE repair_order_services')
     await queryRunner.query('TRUNCATE TABLE repair_orders')
+    await queryRunner.query('TRUNCATE TABLE appointment_services')
     await queryRunner.query('TRUNCATE TABLE appointments')
     await queryRunner.query('TRUNCATE TABLE vehicles')
     await queryRunner.query('TRUNCATE TABLE customers')
     await queryRunner.query('TRUNCATE TABLE services')
     await queryRunner.query('TRUNCATE TABLE users')
 
+    await queryRunner.query('DROP TABLE IF EXISTS repair_order_services')
     await queryRunner.query('DROP TABLE IF EXISTS repair_order_items')
 
     await queryRunner.query('SET FOREIGN_KEY_CHECKS = 1')
@@ -478,10 +479,28 @@ async function seed() {
     const akumulator = getService('Zamena akumulatora')
     const klima = getService('Servis klime')
     const trap = getService('Reglaza trapa')
+    const amortizeri = getService('Zamena amortizera')
     const kvacilo = getService('Zamena kvacila')
     const sijalice = getService('Zamena sijalica')
+    const pregled = getService('Pregled pred kupovinu')
 
     console.log('Seeding appointments...')
+
+    const appointmentServices = [
+      [maliServis, klima],
+      [dijagnostika],
+      [kocnice],
+      [maliServis],
+      [velikiServis],
+      [trap],
+      [akumulator],
+      [amortizeri],
+      [klima, sijalice],
+      [kvacilo],
+      [pregled, maliServis],
+      [dijagnostika],
+      [pregled],
+    ]
 
     const appointments = await appointmentsRepository.save([
       appointmentsRepository.create({
@@ -490,6 +509,7 @@ async function seed() {
         scheduledAt: new Date('2026-06-01T09:00:00'),
         status: AppointmentStatus.COMPLETED,
         description: 'Mali servis i provera klime pre puta.',
+        services: appointmentServices[0],
       }),
       appointmentsRepository.create({
         customerId: customers[4].id,
@@ -497,6 +517,7 @@ async function seed() {
         scheduledAt: new Date('2026-06-01T11:30:00'),
         status: AppointmentStatus.COMPLETED,
         description: 'Dijagnostika zbog lampice check engine.',
+        services: appointmentServices[1],
       }),
       appointmentsRepository.create({
         customerId: customers[1].id,
@@ -504,6 +525,7 @@ async function seed() {
         scheduledAt: new Date('2026-06-02T09:30:00'),
         status: AppointmentStatus.CONFIRMED,
         description: 'Cuje se zvuk pri kocenju.',
+        services: appointmentServices[2],
       }),
       appointmentsRepository.create({
         customerId: customers[2].id,
@@ -511,6 +533,7 @@ async function seed() {
         scheduledAt: new Date('2026-06-02T13:00:00'),
         status: AppointmentStatus.SCHEDULED,
         description: 'Redovan mali servis.',
+        services: appointmentServices[3],
       }),
       appointmentsRepository.create({
         customerId: customers[3].id,
@@ -518,6 +541,7 @@ async function seed() {
         scheduledAt: new Date('2026-06-03T08:30:00'),
         status: AppointmentStatus.COMPLETED,
         description: 'Veliki servis i kontrola rashladnog sistema.',
+        services: appointmentServices[4],
       }),
       appointmentsRepository.create({
         customerId: customers[5].id,
@@ -525,6 +549,7 @@ async function seed() {
         scheduledAt: new Date('2026-06-03T12:00:00'),
         status: AppointmentStatus.CONFIRMED,
         description: 'Vibracije pri brzini preko 100 km/h.',
+        services: appointmentServices[5],
       }),
       appointmentsRepository.create({
         customerId: customers[6].id,
@@ -532,6 +557,7 @@ async function seed() {
         scheduledAt: new Date('2026-06-04T10:00:00'),
         status: AppointmentStatus.COMPLETED,
         description: 'Zamena akumulatora i provera punjenja.',
+        services: appointmentServices[6],
       }),
       appointmentsRepository.create({
         customerId: customers[7].id,
@@ -539,6 +565,7 @@ async function seed() {
         scheduledAt: new Date('2026-06-04T14:00:00'),
         status: AppointmentStatus.SCHEDULED,
         description: 'Pregled oslanjanja i amortizera.',
+        services: appointmentServices[7],
       }),
       appointmentsRepository.create({
         customerId: customers[8].id,
@@ -546,6 +573,7 @@ async function seed() {
         scheduledAt: new Date('2026-06-05T09:00:00'),
         status: AppointmentStatus.CONFIRMED,
         description: 'Servis klime i zamena sijalice.',
+        services: appointmentServices[8],
       }),
       appointmentsRepository.create({
         customerId: customers[9].id,
@@ -553,6 +581,7 @@ async function seed() {
         scheduledAt: new Date('2026-06-05T11:30:00'),
         status: AppointmentStatus.COMPLETED,
         description: 'Zamena seta kvacila.',
+        services: appointmentServices[9],
       }),
       appointmentsRepository.create({
         customerId: customers[10].id,
@@ -560,6 +589,7 @@ async function seed() {
         scheduledAt: new Date('2026-06-06T09:30:00'),
         status: AppointmentStatus.SCHEDULED,
         description: 'Pregled pred put i mali servis.',
+        services: appointmentServices[10],
       }),
       appointmentsRepository.create({
         customerId: customers[11].id,
@@ -567,6 +597,7 @@ async function seed() {
         scheduledAt: new Date('2026-06-06T12:30:00'),
         status: AppointmentStatus.CONFIRMED,
         description: 'Dijagnostika i provera potrosnje goriva.',
+        services: appointmentServices[11],
       }),
       appointmentsRepository.create({
         customerId: customers[0].id,
@@ -574,6 +605,7 @@ async function seed() {
         scheduledAt: new Date('2026-06-07T10:00:00'),
         status: AppointmentStatus.SCHEDULED,
         description: 'Pregled pred kupovinu za drugo vozilo.',
+        services: appointmentServices[12],
       }),
     ])
 
@@ -590,7 +622,6 @@ async function seed() {
         diagnosis: 'Uradjena zamena ulja i filtera. Klima dopunjena freonom.',
         startedAt: new Date('2026-06-01T09:10:00'),
         completedAt: new Date('2026-06-01T11:00:00'),
-        services: [maliServis, klima],
       }),
       repairOrdersRepository.create({
         customerId: customers[4].id,
@@ -602,7 +633,6 @@ async function seed() {
         diagnosis: 'Pronadjena greska lambda sonde. Izvrsena dijagnostika i brisanje gresaka.',
         startedAt: new Date('2026-06-01T11:40:00'),
         completedAt: new Date('2026-06-01T14:20:00'),
-        services: [dijagnostika],
       }),
       repairOrdersRepository.create({
         customerId: customers[1].id,
@@ -614,7 +644,6 @@ async function seed() {
         diagnosis: 'Prednje plocice istrosene. Diskovi imaju ivicu i preporucena je zamena.',
         startedAt: new Date('2026-06-02T09:45:00'),
         completedAt: null,
-        services: [kocnice],
       }),
       repairOrdersRepository.create({
         customerId: customers[3].id,
@@ -626,7 +655,6 @@ async function seed() {
         diagnosis: 'Zamenjen set zupcastog kaisa, vodena pumpa i rashladna tecnost.',
         startedAt: new Date('2026-06-03T08:45:00'),
         completedAt: new Date('2026-06-03T15:30:00'),
-        services: [velikiServis],
       }),
       repairOrdersRepository.create({
         customerId: customers[5].id,
@@ -638,7 +666,6 @@ async function seed() {
         diagnosis: 'Potrebna reglaza trapa i balansiranje tockova.',
         startedAt: new Date('2026-06-03T12:20:00'),
         completedAt: null,
-        services: [trap],
       }),
       repairOrdersRepository.create({
         customerId: customers[6].id,
@@ -650,7 +677,6 @@ async function seed() {
         diagnosis: 'Akumulator slab. Alternator puni ispravno. Akumulator zamenjen.',
         startedAt: new Date('2026-06-04T10:10:00'),
         completedAt: new Date('2026-06-04T10:55:00'),
-        services: [akumulator],
       }),
       repairOrdersRepository.create({
         customerId: customers[8].id,
@@ -662,7 +688,6 @@ async function seed() {
         diagnosis: 'Klima treba dopunu freona. Sijalica pregorela.',
         startedAt: new Date('2026-06-05T09:15:00'),
         completedAt: null,
-        services: [klima, sijalice],
       }),
       repairOrdersRepository.create({
         customerId: customers[9].id,
@@ -674,17 +699,16 @@ async function seed() {
         diagnosis: 'Set kvacila istrosen. Zamenjen set kvacila i provereno curenje ulja.',
         startedAt: new Date('2026-06-05T11:45:00'),
         completedAt: new Date('2026-06-05T18:00:00'),
-        services: [kvacilo],
       }),
     ])
 
     console.log('Seeding invoices...')
 
-    const invoice1 = calculateTax(calculateServicesSubtotal([maliServis, klima]))
-    const invoice2 = calculateTax(calculateServicesSubtotal([dijagnostika]))
-    const invoice3 = calculateTax(calculateServicesSubtotal([velikiServis]))
-    const invoice4 = calculateTax(calculateServicesSubtotal([akumulator]))
-    const invoice5 = calculateTax(calculateServicesSubtotal([kvacilo]))
+    const invoice1 = calculateTax(calculateServicesSubtotal(appointmentServices[0]))
+    const invoice2 = calculateTax(calculateServicesSubtotal(appointmentServices[1]))
+    const invoice3 = calculateTax(calculateServicesSubtotal(appointmentServices[4]))
+    const invoice4 = calculateTax(calculateServicesSubtotal(appointmentServices[6]))
+    const invoice5 = calculateTax(calculateServicesSubtotal(appointmentServices[9]))
 
     await invoicesRepository.save([
       invoicesRepository.create({
@@ -744,8 +768,8 @@ async function seed() {
       }),
     ])
 
-    const repairOrderServiceLinksCount = repairOrders.reduce((total, repairOrder) => {
-      return total + (repairOrder.services?.length || 0)
+    const appointmentServiceLinksCount = appointmentServices.reduce((total, services) => {
+      return total + services.length
     }, 0)
 
     console.log('')
@@ -757,8 +781,8 @@ async function seed() {
     console.log(`Vehicles: ${vehicles.length}`)
     console.log(`Services: ${services.length}`)
     console.log(`Appointments: ${appointments.length}`)
+    console.log(`Appointment service links: ${appointmentServiceLinksCount}`)
     console.log(`Repair orders: ${repairOrders.length}`)
-    console.log(`Repair order service links: ${repairOrderServiceLinksCount}`)
     console.log(`Invoices: 5`)
     console.log('')
     console.log('Test accounts:')

@@ -1,3 +1,4 @@
+import { AnyBulkWriteOperation } from "typeorm/browser"
 import { AppDataSource } from "../config/db"
 import { RepairOrders } from "../entities/RepairOrders"
 
@@ -6,27 +7,27 @@ export class OrderService {
     return AppDataSource.getRepository(RepairOrders)
   }
 
-  static async getAll() {
-    return await this.repo.find({
-      select: {
-        services: {
-          id: true,
-          name: true,
-          price: true,
-        },
-      },
-      order: {
-        id: "ASC",
-      },
-      relations: {
-        services: true,
-      }
-    })
+  static async getAll(query: any) {
+    const queryBuilder = this.repo.createQueryBuilder("order")
+      .leftJoinAndSelect("order.customer", "customer")
+      .leftJoinAndSelect("order.vehicle", "vehicle")
+      .leftJoinAndSelect("order.mechanic", "mechanic")
+
+    if(query.status) {
+      queryBuilder.andWhere("order.status = :status", { status: query.status})
+    }
+    
+    return await queryBuilder.getMany()
   }
 
   static async getById(id: number) {
     const order = await this.repo.findOne({
       where: { id },
+      relations: {
+        customer: true,
+        vehicle: true,
+        mechanic: true,
+      }
     })
 
     if (!order) {

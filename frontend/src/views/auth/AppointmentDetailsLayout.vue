@@ -134,9 +134,9 @@ const repairOrder = computed(() => {
   return appointment.value?.repairOrders || null
 })
 
-const repairOrderServices = computed(() => {
-  return repairOrder.value?.services || []
-})
+// const repairOrderServices = computed(() => {
+//   return repairOrder.value?.services || []
+// })
 
 onMounted(async () => {
   await fetchAppointment()
@@ -262,7 +262,7 @@ onMounted(async () => {
                   </p>
                 </div>
 
-                <div v-if="repairOrderServices.length === 0" class="alert alert-info mb-0">
+                <div v-if="appointment.services?.length === 0 " class="alert alert-info mb-0">
                   Za ovaj radni nalog još nisu dodate usluge.
                 </div>
 
@@ -278,7 +278,7 @@ onMounted(async () => {
 
                     <tbody>
                       <tr
-                        v-for="service in repairOrderServices"
+                        v-for="service in appointment?.services || []"
                         :key="service.id"
                       >
                         <td>

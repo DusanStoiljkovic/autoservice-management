@@ -12,6 +12,7 @@ export class AppointmentService {
     const queryBuilder = this.repo.createQueryBuilder("appointment")
       .leftJoinAndSelect("appointment.customer", "customer")
       .leftJoinAndSelect("appointment.vehicle", "vehicle")
+      .leftJoinAndSelect("appointment.services", "services")
       .leftJoinAndSelect("appointment.repairOrders", "repairOrders")
 
     if (query.status) {
@@ -42,6 +43,7 @@ export class AppointmentService {
         repairOrders: true,
         customer: true,
         vehicle: true,
+        services: true,
       },
     })
 

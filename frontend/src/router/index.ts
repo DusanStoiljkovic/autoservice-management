@@ -61,6 +61,46 @@ const router = createRouter({
       component: AppointmentDetailsLayout
     },
     {
+      path: '/dashboard/customers',
+      name: 'customers-management',
+      component: AppointmentDetailsLayout
+    },
+    {
+      path: '/dashboard/vehicles',
+      name: 'vehicles-management',
+      component: AppointmentDetailsLayout
+    },
+    {
+      path: '/dashboard/appointments',
+      name: 'appointments',
+      component: AppointmentDetailsLayout
+    },
+    {
+      path: '/dashboard/services',
+      name: 'services-management',
+      component: AppointmentDetailsLayout
+    },
+    {
+      path: '/dashboard/repair-orders',
+      name: 'repair-orders-management',
+      component: AppointmentDetailsLayout
+    },
+    {
+      path: '/dashboard/repair-orders/:id',
+      name: 'repair-orders-details',
+      component: AppointmentDetailsLayout
+    },
+    {
+      path: '/dashboard/invoices',
+      name: 'invoices-management',
+      component: AppointmentDetailsLayout
+    },
+    {
+      path: '/dashboard/settings',
+      name: 'settings-management',
+      component: AppointmentDetailsLayout
+    },
+    {
       path: '/:pathMatch(.*)*',
       redirect: '/'
     }
