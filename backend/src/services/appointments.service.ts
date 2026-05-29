@@ -2,6 +2,7 @@ import { In } from "typeorm"
 import { AppDataSource } from "../config/db"
 import { Appointments, AppointmentStatus } from "../entities/Appointments"
 import type { CreateAppointmentDto } from "../dto/AppointmentsDto"
+import { RepairOrders, RepairOrderStatus } from "../entities/RepairOrders"
 
 export class AppointmentService {
   private static get repo() {
@@ -124,11 +125,46 @@ export class AppointmentService {
   }
 
   static async changeStatus(id: number, status: AppointmentStatus) {
-    const appointment = await this.getById(id)
+    return await AppDataSource.manager.transaction(async (manager) => {
+      const appointment = await manager.findOne(Appointments, {
+        where: { id },
+        relations: { customer: true, vehicle: true, services: true },
+      })
 
-    appointment.status = status
+      if (!appointment) {
+        throw new Error(`Appointment with id ${id} was not found.`)
+      }
 
-    return await this.repo.save(appointment)
+      appointment.status = status
+
+      const existingOrder = await manager.findOne(RepairOrders, {
+        where: { appointmentId: appointment.id },
+      })
+
+      if (status === AppointmentStatus.CONFIRMED && !existingOrder) {
+        const repairOrder = manager.create(RepairOrders, {
+          customerId: appointment.customerId,
+          vehicleId: appointment.vehicleId,
+          appointmentId: appointment.id,
+          mechanicId: null,
+          status: RepairOrderStatus.IN_PROGRESS,
+          problemDescription: appointment.description ?? "",
+          diagnosis: null,
+          startedAt: new Date(),
+          completedAt: null,
+        })
+
+        await manager.save(repairOrder)
+      }
+
+      if (status === AppointmentStatus.CANCELLED && existingOrder) {
+        existingOrder.status = RepairOrderStatus.CANCELLED
+        existingOrder.completedAt = new Date()
+        await manager.save(existingOrder)
+      }
+
+      return await manager.save(appointment)
+    })
   }
 
   static async delete(id: number) {

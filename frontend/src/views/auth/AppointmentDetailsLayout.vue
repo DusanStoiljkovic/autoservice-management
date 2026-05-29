@@ -10,11 +10,18 @@ const router = useRouter()
 const API_BASE_URL = import.meta.env.VITE_API_URL
 
 const appointment = ref<any>(null)
+const isEditingDiagnosis = ref(false)
+const diagnosisDraft = ref('')
+const diagnosisError = ref('')
 const loading = ref(false)
 const errorMessage = ref('')
 
 const appointmentId = computed(() => {
   return Number(route.params.id)
+})
+
+const repairOrder = computed(() => {
+  return appointment.value?.repairOrders || null
 })
 
 async function fetchAppointment() {
@@ -34,6 +41,38 @@ async function fetchAppointment() {
     errorMessage.value = 'Termin trenutno ne može da se učita.'
   } finally {
     loading.value = false
+  }
+}
+
+function editDiagnosis() {
+  diagnosisDraft.value = repairOrder.value?.diagnosis || ''
+  diagnosisError.value = ''
+  isEditingDiagnosis.value = true
+}
+
+function cancelEditDiagnosis() {
+  isEditingDiagnosis.value = false
+  diagnosisDraft.value = ''
+  diagnosisError.value = ''
+}
+
+async function saveDiagnosis() {
+  if (!repairOrder.value) {
+    return
+  }
+
+  try {
+    diagnosisError.value = ''
+
+    await axios.put(`${API_BASE_URL}/repair-orders/${repairOrder.value.id}`, {
+      diagnosis: diagnosisDraft.value
+    })
+
+    appointment.value.repairOrders.diagnosis = diagnosisDraft.value
+    isEditingDiagnosis.value = false
+  } catch (error) {
+    console.error('Greška prilikom čuvanja dijagnoze:', error)
+    diagnosisError.value = 'Dijagnoza trenutno ne može da se sačuva.'
   }
 }
 
@@ -129,14 +168,6 @@ const vehicleName = computed(() => {
 
   return `${appointment.value.vehicle.make} ${appointment.value.vehicle.model}`
 })
-
-const repairOrder = computed(() => {
-  return appointment.value?.repairOrders || null
-})
-
-// const repairOrderServices = computed(() => {
-//   return repairOrder.value?.services || []
-// })
 
 onMounted(async () => {
   await fetchAppointment()
@@ -253,16 +284,59 @@ onMounted(async () => {
 
               <div v-else>
                 <div class="mb-4">
-                  <p class="text-body-secondary mb-1">
-                    Dijagnoza
-                  </p>
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <p class="text-body-secondary mb-0">
+                      Dijagnoza
+                    </p>
 
-                  <p class="mb-0">
-                    {{ repairOrder.diagnosis || 'Dijagnoza još nije uneta.' }}
-                  </p>
+                    <div>
+                      <button
+                        v-if="!isEditingDiagnosis"
+                        class="btn btn-sm btn-outline-primary"
+                        @click="editDiagnosis"
+                      >
+                        Izmeni
+                      </button>
+
+                      <div v-else class="d-flex gap-2">
+                        <button
+                          class="btn btn-sm btn-success"
+                          @click="saveDiagnosis"
+                        >
+                          Sačuvaj
+                        </button>
+
+                        <button
+                          class="btn btn-sm btn-outline-secondary"
+                          @click="cancelEditDiagnosis"
+                        >
+                          Otkaži
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div v-if="!isEditingDiagnosis">
+                    <p class="mb-0">
+                      {{ repairOrder.diagnosis || 'Dijagnoza još nije uneta.' }}
+                    </p>
+                  </div>
+
+                  <div v-else>
+                    <textarea
+                      v-model="diagnosisDraft"
+                      class="form-control"
+                      rows="4"
+                      placeholder="Unesi dijagnozu..."
+                    />
+
+                    <p v-if="diagnosisError" class="text-danger small mb-0 mt-2">
+                      {{ diagnosisError }}
+                    </p>
+                  </div>
                 </div>
 
-                <div v-if="appointment.services?.length === 0 " class="alert alert-info mb-0">
+                <div v-if="!appointment.services?.length" class="alert alert-info mb-0">
                   Za ovaj radni nalog još nisu dodate usluge.
                 </div>
 
@@ -278,7 +352,7 @@ onMounted(async () => {
 
                     <tbody>
                       <tr
-                        v-for="service in appointment?.services || []"
+                        v-for="service in appointment.services"
                         :key="service.id"
                       >
                         <td>

@@ -16,7 +16,10 @@ export class OrderService {
     if(query.status) {
       queryBuilder.andWhere("order.status = :status", { status: query.status})
     }
-    
+    if(query.appointmentId) {
+      queryBuilder.andWhere("order.appointmentId = :appointmentId", { appointmentId: query.appointmentId })
+    }
+
     return await queryBuilder.getMany()
   }
 
@@ -38,8 +41,17 @@ export class OrderService {
   }
 
   static async create(orderData: Partial<RepairOrders>) {
-    const order = this.repo.create(orderData)
+    if(orderData.appointmentId) {
+      const existingOrder = await this.repo.findOne({
+        where: { appointmentId: orderData.appointmentId}
+      })
 
+      if(existingOrder) {
+        throw new Error(`Repair order for appointment with id ${orderData.appointmentId} already exists.`)
+      }
+    }
+
+    const order = this.repo.create(orderData)
     return await this.repo.save(order)
   }
 

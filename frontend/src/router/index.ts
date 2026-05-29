@@ -10,6 +10,13 @@ import LoginPage from '../views/auth/LoginPage.vue'
 import RegisterPage from '../views/auth/RegisterPage.vue'
 import DashboardLayout from '../views/auth/DashboardLayout.vue'
 import AppointmentDetailsLayout from '../views/auth/AppointmentDetailsLayout.vue'
+import CustomersManagement from '../views/auth/CustomersManagement.vue'
+import VehiclesManagement from '../views/auth/VehicleManagement.vue'
+import AppointmentsManagement from '../views/auth/AppointmentsManagement.vue'
+import ServicesManagement from '../views/auth/ServiceManagement.vue'
+import RepairOrdersManagement from '../views/auth/RepairsOrdersManagement.vue'
+import InvoicesManagement from '../views/auth/InvoicesManagement.vue'
+import SettingsPage from '../views/auth/SettingsPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -56,34 +63,34 @@ const router = createRouter({
       component: DashboardLayout
     },
     {
+      path: '/dashboard/customers',
+      name: 'customers-management',
+      component: CustomersManagement
+    },
+    {
+      path: '/dashboard/vehicles',
+      name: 'vehicles-management',
+      component: VehiclesManagement
+    },
+    {
+      path: '/dashboard/appointments',
+      name: 'appointments',
+      component: AppointmentsManagement
+    },
+    {
       path: '/dashboard/appointments/:id',
       name: 'appointment-details',
       component: AppointmentDetailsLayout
     },
     {
-      path: '/dashboard/customers',
-      name: 'customers-management',
-      component: AppointmentDetailsLayout
-    },
-    {
-      path: '/dashboard/vehicles',
-      name: 'vehicles-management',
-      component: AppointmentDetailsLayout
-    },
-    {
-      path: '/dashboard/appointments',
-      name: 'appointments',
-      component: AppointmentDetailsLayout
-    },
-    {
       path: '/dashboard/services',
       name: 'services-management',
-      component: AppointmentDetailsLayout
+      component: ServicesManagement
     },
     {
       path: '/dashboard/repair-orders',
       name: 'repair-orders-management',
-      component: AppointmentDetailsLayout
+      component: RepairOrdersManagement
     },
     {
       path: '/dashboard/repair-orders/:id',
@@ -93,12 +100,12 @@ const router = createRouter({
     {
       path: '/dashboard/invoices',
       name: 'invoices-management',
-      component: AppointmentDetailsLayout
+      component: InvoicesManagement
     },
     {
       path: '/dashboard/settings',
       name: 'settings-management',
-      component: AppointmentDetailsLayout
+      component: SettingsPage
     },
     {
       path: '/:pathMatch(.*)*',

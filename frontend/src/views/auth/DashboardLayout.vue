@@ -349,8 +349,8 @@ onMounted(async () => {
                       @click="() => $router.push(`/dashboard/appointments/${appointment.id}`)"
                     >
                       <td>{{ Intl.DateTimeFormat('sr-RS', {hour: '2-digit', minute: '2-digit'}).format(new Date(appointment.scheduledAt)) }}</td>
-                      <td>{{ appointment.customer.firstName }} {{ appointment.customer.lastName }}</td>
-                      <td>{{ appointment.vehicle.make }} {{  appointment.vehicle.model }}</td>
+                      <td>{{ appointment.customer?.firstName }} {{ appointment.customer?.lastName }}</td>
+                      <td>{{ appointment.vehicle?.make }} {{ appointment.vehicle?.model }}</td>
                       <td>
                         <span class="badge" :class="getStatusClass(appointment.status)">
                           {{ appointment.status }}
@@ -449,8 +449,8 @@ onMounted(async () => {
                       <td>{{ order.customer.firstName }} {{ order.customer.lastName }}</td>
                       <td>{{ order.vehicle.make }} {{ order.vehicle.model }}</td>
                       <td>
-                        <span class="badge" :class="getStatusClass(order.mechanic.status)">
-                          {{ order.mechanic.firstName }} {{ order.mechanic.lastName }}
+                        <span class="badge" :class="getStatusClass(order?.mechanic?.status)">
+                          {{ order.mechanic?.firstName || "Nedodeljen" }} {{ order.mechanic?.lastName }}
                         </span>
                       </td>
                     </tr>

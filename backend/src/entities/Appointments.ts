@@ -83,7 +83,7 @@ export class Appointments {
   @JoinTable({
     name: "appointment_services",
     joinColumn: {
-      name: "service_id",
+      name: "appointment_id",
       referencedColumnName: "id",
     },
     inverseJoinColumn: {
