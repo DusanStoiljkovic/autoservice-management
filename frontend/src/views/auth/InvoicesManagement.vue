@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import Sidebar from '../components/Sidebar.vue'
+import { defineBasicLoader } from 'vue-router/dist/experimental/index.js'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL
 
@@ -143,12 +144,19 @@ onMounted(fetchInvoices)
           </p>
         </div>
 
-        <select v-model="statusFilter" class="form-select w-auto">
-          <option value="ALL">Svi statusi</option>
-          <option v-for="option in statusOptions" :key="option.value" :value="option.value">
-            {{ option.label }}
-          </option>
-        </select>
+        <div class="d-flex gap-2">
+          <router-link to="/dashboard/invoices/new" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>
+            Nova faktura
+          </router-link>
+          <select v-model="statusFilter" class="form-select w-auto">
+            <option value="ALL">Svi statusi</option>
+            <option v-for="option in statusOptions" :key="option.value" :value="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+        
       </div>
 
       <div class="row g-4 mb-4">

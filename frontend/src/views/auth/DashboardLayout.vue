@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 import Sidebar from '../components/Sidebar.vue'
 import type { Customer } from '@/types/customer.ts'
 import type { Service } from '@/types/services.ts'
+
+const router = useRouter()
 
 const customers = ref<Customer[]>([])
 const vehicles = ref<any[]>([])
 const services = ref<Service[]>([])
 const showAppointments = ref<any[]>([])
 const allAppointments = ref<any[]>([])
-const workingOrders = ref<any[]>([])
+const repairOrders = ref<any[]>([])
 const invoices = ref<any[]>([])
 
 const selectedStatus = ref('SCHEDULED')
@@ -26,7 +29,7 @@ async function fetchData() {
       servicesRes,
       showAppointmentsRes,
       allAppointmentsRes,
-      workingOrdersRes,
+      repairOrdersRes,
       invoicesRes
     ] = await Promise.all([
       axios.get(`${API_BASE_URL}/customers/all`),
@@ -39,9 +42,7 @@ async function fetchData() {
 
       axios.get(`${API_BASE_URL}/appointments/all`),
 
-      axios.get(
-        `${API_BASE_URL}/repair-orders/all?status=IN_PROGRESS`
-      ),
+      axios.get(`${API_BASE_URL}/repair-orders/all`),
 
       axios.get(`${API_BASE_URL}/invoices/all`)
     ])
@@ -51,42 +52,64 @@ async function fetchData() {
     services.value = servicesRes.data
     showAppointments.value = showAppointmentsRes.data
     allAppointments.value = allAppointmentsRes.data
-    workingOrders.value = workingOrdersRes.data
+    repairOrders.value = repairOrdersRes.data
     invoices.value = invoicesRes.data
   } catch (error) {
     console.error('Greška prilikom učitavanja podataka:', error)
   }
 }
 
+// ----- Radni nalozi -----
+const ordersInProgress = computed(() => {
+  return repairOrders.value.filter(order => order.status === 'IN_PROGRESS')
+})
+
+const openOrdersCount = computed(() => {
+  return repairOrders.value.filter(
+    order => order.status === 'OPEN' || order.status === 'IN_PROGRESS'
+  ).length
+})
+
+// ----- Fakture -----
 const paidInvoices = computed(() => {
   return invoices.value.filter(invoice => invoice.status === 'PAID')
 })
 
+// Neplaćene = sve sto nije placeno niti otkazano (DRAFT ili ISSUED)
 const unpaidInvoices = computed(() => {
-  return invoices.value.filter(invoice => invoice.status === 'DRAFTED')
-})
-
-const overdueInvoices = computed(() => {
-  return invoices.value.filter(invoice => invoice.status === 'ISSUED')
+  return invoices.value.filter(
+    invoice => invoice.status !== 'PAID' && invoice.status !== 'CANCELLED'
+  )
 })
 
 const totalInvoiceAmount = computed(() => {
-  return invoices.value.reduce((acc, invoice) => {
-    return acc + Number(invoice.total ?? 0)
-  }, 0)
+  return invoices.value.reduce((acc, invoice) => acc + Number(invoice.total ?? 0), 0)
+})
+
+const paidInvoiceAmount = computed(() => {
+  return paidInvoices.value.reduce((acc, invoice) => acc + Number(invoice.total ?? 0), 0)
 })
 
 const unpaidInvoiceAmount = computed(() => {
-  return unpaidInvoices.value.reduce((acc, invoice) => {
-    return acc + Number(invoice.total ?? 0)
-  }, 0)
+  return unpaidInvoices.value.reduce((acc, invoice) => acc + Number(invoice.total ?? 0), 0)
+})
+
+// ----- Termini -----
+const scheduledCount = computed(() => {
+  return allAppointments.value.filter(app => app.status === 'SCHEDULED').length
+})
+
+const activeAppointmentsCount = computed(() => {
+  return allAppointments.value.filter(
+    app => app.status === 'SCHEDULED' || app.status === 'CONFIRMED'
+  ).length
 })
 
 const stats = computed(() => {
   return [
     {
-      title: 'Zarađeno',
-      value: formatCurrency(totalInvoiceAmount.value),
+      title: 'Naplaćeno',
+      value: formatCurrency(paidInvoiceAmount.value),
       icon: 'bi bi-cash-stack'
     },
     {
@@ -96,22 +119,16 @@ const stats = computed(() => {
     },
     {
       title: 'Nepotvrđeni termini',
-      value: getNumOfNoCompletedAppointments(),
+      value: scheduledCount.value,
       icon: 'bi bi-calendar-event'
     },
     {
       title: 'Otvoreni radni nalozi',
-      value: workingOrders.value.length,
+      value: openOrdersCount.value,
       icon: 'bi bi-clipboard-check'
     }
   ]
 })
-
-function getNumOfNoCompletedAppointments() {
-  return allAppointments.value.filter(
-    app => app.status === 'SCHEDULED'
-  ).length
-}
 
 function getStatusClass(status: string) {
   if (status === 'CONFIRMED') {
@@ -119,10 +136,25 @@ function getStatusClass(status: string) {
   }
 
   if (status === 'COMPLETED') {
-    return 'text-bg-warning'
+    return 'text-bg-secondary'
+  }
+
+  if (status === 'CANCELLED') {
+    return 'text-bg-danger'
   }
 
   return 'text-bg-primary'
+}
+
+function formatTime(date: string) {
+  if (!date) {
+    return '-'
+  }
+
+  return new Intl.DateTimeFormat('sr-RS', {
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(new Date(date))
 }
 
 function getDateFrom(period: string) {
@@ -217,32 +249,28 @@ function getDateTo(period: string) {
   return dateTo.toISOString()
 }
 
-function getWorkingHoursPerVehicle(vehicleId: number) {
-  const appointment = allAppointments.value.find(
-    app => app.vehicle?.id === vehicleId
-  )
+function getWorkingMinutesPerVehicle(vehicleId: number) {
+  if (!vehicleId) {
+    return 0
+  }
+
+  const appointment = allAppointments.value.find(app => app.vehicle?.id === vehicleId)
 
   if (!appointment?.services) {
     return 0
   }
 
-  const workingHours = appointment.services.reduce(
-    (total: number, service: Service) => {
-      return total + (service.estimatedDurationMinutes ?? 0)
-    },
+  return appointment.services.reduce(
+    (total: number, service: Service) => total + (service.estimatedDurationMinutes ?? 0),
     0
   )
-
-  return workingHours
 }
 
 function formatCurrency(value: number) {
   return `${value.toLocaleString('sr-RS')} RSD`
 }
 
-onMounted(async () => {
-  await fetchData()
-})
+onMounted(fetchData)
 </script>
 
 <template>
@@ -250,26 +278,14 @@ onMounted(async () => {
     <Sidebar />
 
     <main class="dashboard-content bg-body-tertiary">
-      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4">
-        <div>
-          <h1 class="h2 mb-1">
-            Dashboard
-          </h1>
+      <div class="mb-4">
+        <h1 class="h2 mb-1">
+          Dashboard
+        </h1>
 
-          <p class="text-body-secondary mb-0">
-            Pregled rada auto servisa, termina, klijenata i faktura.
-          </p>
-        </div>
-
-        <div class="btn-toolbar mt-3 mt-md-0">
-          <button type="button" class="btn btn-sm btn-outline-secondary me-2">
-            Izvezi
-          </button>
-
-          <button type="button" class="btn btn-sm btn-outline-secondary">
-            Ova nedelja
-          </button>
-        </div>
+        <p class="text-body-secondary mb-0">
+          Pregled rada auto servisa, termina, klijenata i faktura.
+        </p>
       </div>
 
       <div class="row g-4 mb-4">
@@ -307,15 +323,16 @@ onMounted(async () => {
               <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                   <h5 class="fw-bold mb-1">
-                    Današnji termini
+                    Termini
                   </h5>
 
                   <p class="text-body-secondary mb-0">
-                    Pregled zakazanih termina za danas.
+                    Pregled zakazanih termina.
                   </p>
                 </div>
+
                 <div class="d-flex gap-2">
-                  <select class="form-select"  aria-label="status" v-model="selectedStatus" @change="fetchData">
+                  <select class="form-select" aria-label="status" v-model="selectedStatus" @change="fetchData">
                     <option value="SCHEDULED">Zakazani</option>
                     <option value="CONFIRMED">Potvrđeni</option>
                     <option value="COMPLETED">Završeni</option>
@@ -331,7 +348,11 @@ onMounted(async () => {
                 </div>
               </div>
 
-              <div class="table-responsive">
+              <div v-if="showAppointments.length === 0" class="alert alert-secondary mb-0">
+                Nema termina za izabrani period.
+              </div>
+
+              <div v-else class="table-responsive">
                 <table class="table align-middle mb-0">
                   <thead>
                     <tr>
@@ -346,9 +367,10 @@ onMounted(async () => {
                     <tr
                       v-for="appointment in showAppointments"
                       :key="appointment.id"
-                      @click="() => $router.push(`/dashboard/appointments/${appointment.id}`)"
+                      class="cursor-pointer"
+                      @click="router.push(`/dashboard/appointments/${appointment.id}`)"
                     >
-                      <td>{{ Intl.DateTimeFormat('sr-RS', {hour: '2-digit', minute: '2-digit'}).format(new Date(appointment.scheduledAt)) }}</td>
+                      <td>{{ formatTime(appointment.scheduledAt) }}</td>
                       <td>{{ appointment.customer?.firstName }} {{ appointment.customer?.lastName }}</td>
                       <td>{{ appointment.vehicle?.make }} {{ appointment.vehicle?.model }}</td>
                       <td>
@@ -372,20 +394,20 @@ onMounted(async () => {
               </h5>
 
               <div class="d-grid gap-2">
-                <button class="btn btn-primary">
+                <button class="btn btn-primary" @click="router.push('/book-appointment')">
                   Novi termin
                 </button>
 
-                <button class="btn btn-outline-primary">
+                <button class="btn btn-outline-primary" @click="router.push('/dashboard/customers')">
                   Dodaj klijenta
                 </button>
 
-                <button class="btn btn-outline-primary">
+                <button class="btn btn-outline-primary" @click="router.push('/dashboard/vehicles')">
                   Dodaj vozilo
                 </button>
 
-                <button class="btn btn-outline-primary">
-                  Novi radni nalog
+                <button class="btn btn-outline-primary" @click="router.push('/dashboard/repair-orders')">
+                  Radni nalozi
                 </button>
               </div>
 
@@ -397,17 +419,17 @@ onMounted(async () => {
 
               <div class="d-flex justify-content-between mb-2">
                 <span class="text-body-secondary">Aktivni termini</span>
-                <strong>8</strong>
+                <strong>{{ activeAppointmentsCount }}</strong>
               </div>
 
               <div class="d-flex justify-content-between mb-2">
                 <span class="text-body-secondary">Nalozi u toku</span>
-                <strong>5</strong>
+                <strong>{{ ordersInProgress.length }}</strong>
               </div>
 
               <div class="d-flex justify-content-between">
                 <span class="text-body-secondary">Neplaćene fakture</span>
-                <strong>3</strong>
+                <strong>{{ unpaidInvoices.length }}</strong>
               </div>
             </div>
           </div>
@@ -418,15 +440,15 @@ onMounted(async () => {
         <div class="col-xl-6">
           <div class="card dashboard-card shadow-sm rounded-4 h-100">
             <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                  <h5 class="fw-bold mb-1">
-                    Vozila na servisu
-                  </h5>
-                </div>
+              <h5 class="fw-bold mb-4">
+                Vozila na servisu
+              </h5>
+
+              <div v-if="ordersInProgress.length === 0" class="alert alert-secondary mb-0">
+                Trenutno nema vozila na servisu.
               </div>
 
-              <div class="table-responsive">
+              <div v-else class="table-responsive">
                 <table class="table align-middle mb-0">
                   <thead>
                     <tr>
@@ -434,24 +456,26 @@ onMounted(async () => {
                       <th>Trajanje</th>
                       <th>Klijent</th>
                       <th>Vozilo</th>
-                      <th>Mehaničar</th>
+                      <th>Majstor</th>
                     </tr>
                   </thead>
 
                   <tbody>
                     <tr
-                      v-for="order in workingOrders"
+                      v-for="order in ordersInProgress"
                       :key="order.id"
-                      @click="() => $router.push(`/dashboard/repair-orders/${order.id}`)"
+                      class="cursor-pointer"
+                      @click="router.push(`/dashboard/repair-orders/${order.id}`)"
                     >
-                      <td>{{ new Date(order.startedAt).getHours()}}:{{ new Date(order.startedAt).getMinutes() }}</td>
-                      <td>{{ getWorkingHoursPerVehicle(order.vehicle.id) }} min</td>
-                      <td>{{ order.customer.firstName }} {{ order.customer.lastName }}</td>
-                      <td>{{ order.vehicle.make }} {{ order.vehicle.model }}</td>
+                      <td>{{ formatTime(order.startedAt) }}</td>
+                      <td>{{ getWorkingMinutesPerVehicle(order.vehicle?.id) }} min</td>
+                      <td>{{ order.customer?.firstName }} {{ order.customer?.lastName }}</td>
+                      <td>{{ order.vehicle?.make }} {{ order.vehicle?.model }}</td>
                       <td>
-                        <span class="badge" :class="getStatusClass(order?.mechanic?.status)">
-                          {{ order.mechanic?.firstName || "Nedodeljen" }} {{ order.mechanic?.lastName }}
+                        <span v-if="order.mechanic">
+                          {{ order.mechanic.firstName }} {{ order.mechanic.lastName }}
                         </span>
+                        <span v-else class="text-body-secondary">Nedodeljen</span>
                       </td>
                     </tr>
                   </tbody>
@@ -490,14 +514,9 @@ onMounted(async () => {
                 <strong class="text-success">{{ paidInvoices.length }}</strong>
               </div>
 
-              <div class="d-flex justify-content-between mb-2">
+              <div class="d-flex justify-content-between mb-3">
                 <span class="text-body-secondary">Neplaćene fakture</span>
                 <strong class="text-warning">{{ unpaidInvoices.length }}</strong>
-              </div>
-
-              <div class="d-flex justify-content-between mb-3">
-                <span class="text-body-secondary">Dospele fakture</span>
-                <strong class="text-danger">{{ overdueInvoices.length }}</strong>
               </div>
 
               <hr class="my-4" />
@@ -553,6 +572,10 @@ onMounted(async () => {
   --bs-table-bg: transparent;
   --bs-table-color: var(--bs-body-color);
   --bs-table-border-color: var(--bs-border-color);
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 
 hr {

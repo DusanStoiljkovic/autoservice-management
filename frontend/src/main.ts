@@ -17,9 +17,12 @@ function applySystemTheme() {
 applySystemTheme()
 
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applySystemTheme)
-
+document.title = "AutoService Management"
 const app = createApp(App)
-
+const iconLink = document.querySelector<HTMLLinkElement>('link[rel="icon"]')
+if (iconLink) {
+    iconLink.href = "/car-front-fill.svg"
+}
 app.use(createPinia())
 app.use(router)
 
