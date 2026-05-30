@@ -22,17 +22,16 @@ export class UserService {
     }
   }
 
-  static async getAll() {
-    const users = await this.repo.find({
-      where: {
-        deletedAt: IsNull(),
-      },
-      order: {
-        id: "ASC",
-      },
-    })
+  static async getAll(query: any) {
+    const queryBuilder = this.repo.createQueryBuilder("user")
+    
+    if(query.role) {
+      queryBuilder.andWhere("user.role = :role", { role: query.role})
+    }
 
-    return users.map((user) => this.userResponse(user))
+    queryBuilder.orderBy("user.id", "ASC")
+
+    return await queryBuilder.getMany()
   }
 
   static async getById(id: number) {

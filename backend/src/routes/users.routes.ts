@@ -5,8 +5,7 @@ export const UserRoute = Router()
 
 UserRoute.get("/all", async (req: Request, res: Response) => {
   try {
-    const users = await UserService.getAll()
-
+    const users = await UserService.getAll(req.query)
     res.json(users)
   } catch (error: any) {
     res.status(500).json({

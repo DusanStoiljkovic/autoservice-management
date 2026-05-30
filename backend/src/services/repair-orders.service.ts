@@ -63,6 +63,12 @@ export class OrderService {
     return await this.repo.save(order)
   }
 
+  static async editPartial(id: number, request: any) {
+    const order = await this.getById(id)
+    Object.assign(order, request)
+    return await this.repo.save(order)
+  }
+
   static async delete(id: number) {
     const order = await this.getById(id)
 

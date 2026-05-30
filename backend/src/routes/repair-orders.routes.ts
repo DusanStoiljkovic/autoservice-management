@@ -45,6 +45,16 @@ OrderRoute.put("/:id", async (req: Request, res: Response) => {
   }
 })
 
+OrderRoute.patch("/:id", async (request: Request, response: Response) => {
+  try {
+    const id = Number(request.params.id)
+    const order = await OrderService.editPartial(id, request.body)
+    response.json(order)
+  } catch (error) {
+    response.status(500).json({ message: "Failed to update order" })
+  }
+})
+
 OrderRoute.delete("/:id", async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id)

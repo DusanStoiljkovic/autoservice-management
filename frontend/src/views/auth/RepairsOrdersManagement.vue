@@ -12,6 +12,8 @@ const loading = ref(false)
 const errorMessage = ref('')
 const statusFilter = ref('ALL')
 
+const mechanics = ref<any[]>([])
+
 const statusOptions = [
   { value: 'OPEN', label: 'Otvoren' },
   { value: 'IN_PROGRESS', label: 'U toku' },
@@ -74,11 +76,33 @@ async function fetchOrders() {
   }
 }
 
+async function fetchMechanics() {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/users/all?role=MECHANIC`)
+    mechanics.value = response.data
+  } catch (error) {
+    console.error("Greška prilikom učitavanja majstora:", error)
+  }
+}
+
 function openDetails(order: any) {
   router.push(`/dashboard/repair-orders/${order.id}`)
 }
 
-onMounted(fetchOrders)
+async function pickMechanic(order: any, mechanic: any) {
+  try {
+    order.mechanic = mechanic
+    await axios.patch(`${API_BASE_URL}/repair-orders/${order.id}`, order)
+  } catch (error) {
+    console.error("Greška prilikom dodeljivanja majstora:", error)
+  }
+  
+}
+
+onMounted(async () => {
+  await fetchOrders()
+  await fetchMechanics()
+})
 </script>
 
 <template>
@@ -151,6 +175,22 @@ onMounted(fetchOrders)
                   </td>
                   <td>{{ formatDate(order.createdAt) }}</td>
                   <td class="text-end">
+                    <div class="dropdown d-inline-block me-2">
+                      <button
+                        class="btn btn-sm btn-outline-secondary dropdown-toggle text-warning"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                      >
+                        {{ order.mechanic?.firstName ?? "Izaberi majstora" }} {{ order.mechanic?.lastName ?? "" }}
+                      </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li v-for="mechanic in mechanics" :key="mechanic.id">
+                          <button class="dropdown-item" @click="pickMechanic(order, mechanic)">
+                            {{ mechanic.firstName }} {{ mechanic.lastName }}
+                          </button>
+                        </li>
+                      </ul>
+                      </div>
                     <button class="btn btn-sm btn-outline-primary" @click="openDetails(order)">
                       <i class="bi bi-eye"></i>
                     </button>

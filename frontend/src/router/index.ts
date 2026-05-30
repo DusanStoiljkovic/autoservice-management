@@ -17,6 +17,7 @@ import ServicesManagement from '../views/auth/ServiceManagement.vue'
 import RepairOrdersManagement from '../views/auth/RepairsOrdersManagement.vue'
 import InvoicesManagement from '../views/auth/InvoicesManagement.vue'
 import SettingsPage from '../views/auth/SettingsPage.vue'
+import RepairOrderDetailsPage from '@/views/auth/RepairOrderDetailsPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -95,7 +96,7 @@ const router = createRouter({
     {
       path: '/dashboard/repair-orders/:id',
       name: 'repair-orders-details',
-      component: AppointmentDetailsLayout
+      component: RepairOrderDetailsPage
     },
     {
       path: '/dashboard/invoices',
