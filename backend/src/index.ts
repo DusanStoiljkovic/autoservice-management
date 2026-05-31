@@ -38,7 +38,7 @@ app.use('/api/invoices', InvoiceRoute)
 
 
 configDotenv()
-const port = Number(process.env.SERVER_PORT)
+const port = Number(process.env.PORT) || Number(process.env.SERVER_PORT) || 3300
 AppDataSource.initialize().then(() => {
     console.log("Database connected");
 

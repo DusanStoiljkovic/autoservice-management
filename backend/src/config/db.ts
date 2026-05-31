@@ -19,4 +19,5 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_NAME,
     synchronize: true,
     entities: [Invoices, Users, Customers, Appointments, RepairOrders, Services, Vehicles],
+    ssl: { rejectUnauthorized: false },
 })
