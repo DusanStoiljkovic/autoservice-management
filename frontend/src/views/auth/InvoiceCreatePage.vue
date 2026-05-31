@@ -2,6 +2,9 @@
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import Sidebar from '../components/Sidebar.vue'
+import { useRoute, useRouter } from 'vue-router'
+
+const route = useRoute()
 
 const API_BASE_URL = import.meta.env.VITE_API_URL
 
@@ -187,6 +190,12 @@ function exportPdf() {
 onMounted(async () => {
   invoiceNumber.value = generateInvoiceNumber()
   await fetchData()
+
+  const preselect = Number(route.query.orderId)
+  if(preselect) {
+    selectedOrderId.value = preselect
+    await onOrderSelected()
+  }
 })
 </script>
 

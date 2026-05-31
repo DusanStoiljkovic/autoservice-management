@@ -109,7 +109,7 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     { 
-      path: '/dashboard/invoices/new', 
+      path: '/dashboard/invoices/new?orderId=<id>', 
       name: 'invoice-create', 
       component: InvoiceCreatePage,
       meta: { requiresAuth: true }
