@@ -269,7 +269,7 @@ onMounted(fetchData)
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="invoice in unpaidInvoices" :key="invoice.id">
+                  <tr v-for="invoice in unpaidInvoices" :key="invoice.id" @click="$router.push(`/dashboard/invoices/${invoice.id}`)">
                     <td class="fw-semibold">{{ invoice.invoiceNumber }}</td>
                     <td>
                       <span class="badge" :class="invoiceStatusClass(invoice.status)">
@@ -279,11 +279,11 @@ onMounted(fetchData)
                     <td>{{ formatDate(invoice.issuedAt) }}</td>
                     <td class="text-end fw-semibold">{{ formatPrice(invoice.total) }}</td>
                     <td class="text-end">
-                      <button class="btn btn-sm btn-success me-2" @click="markAsPaid(invoice)">
+                      <button class="btn btn-sm btn-success me-2" @click.stop="markAsPaid(invoice)">
                         Naplati
                       </button>
 
-                      <button class="btn btn-sm btn-outline-danger" @click="deleteInvoice(invoice)">
+                      <button class="btn btn-sm btn-outline-danger" @click.stop="deleteInvoice(invoice)">
                         <i class="bi bi-trash"></i>
                       </button>
                     </td>
@@ -315,7 +315,7 @@ onMounted(fetchData)
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="invoice in paidInvoices" :key="invoice.id">
+                  <tr v-for="invoice in paidInvoices" :key="invoice.id" @click="$router.push(`/dashboard/invoices/${invoice.id}`)">
                     <td class="fw-semibold">{{ invoice.invoiceNumber }}</td>
                     <td>{{ formatDate(invoice.issuedAt) }}</td>
                     <td>{{ formatDate(invoice.paidAt) }}</td>

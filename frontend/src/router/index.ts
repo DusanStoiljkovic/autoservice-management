@@ -19,6 +19,7 @@ import InvoicesManagement from '../views/auth/InvoicesManagement.vue'
 import SettingsPage from '../views/auth/SettingsPage.vue'
 import RepairOrderDetailsPage from '@/views/auth/RepairOrderDetailsPage.vue'
 import InvoiceCreatePage from '@/views/auth/InvoiceCreatePage.vue'
+import InvoiceDetailsPage from '@/views/auth/InvoiceDetailsPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -112,6 +113,12 @@ const router = createRouter({
       path: '/dashboard/invoices/new', 
       name: 'invoice-create', 
       component: InvoiceCreatePage,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/dashboard/invoices/:id',
+      name: 'invoice-details',
+      component: InvoiceDetailsPage,
       meta: { requiresAuth: true }
     },
     {

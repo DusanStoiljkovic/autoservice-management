@@ -158,7 +158,7 @@ onMounted(async () => {
               </thead>
 
               <tbody>
-                <tr v-for="order in filteredOrders" :key="order.id">
+                <tr v-for="order in filteredOrders" :key="order.id" @click="router.push(`/dashboard/repair-orders/${order.id}`)">
                   <td class="fw-semibold">#{{ order.id }}</td>
                   <td>{{ order.customer?.firstName }} {{ order.customer?.lastName }}</td>
                   <td>{{ order.vehicle?.make }} {{ order.vehicle?.model }}</td>

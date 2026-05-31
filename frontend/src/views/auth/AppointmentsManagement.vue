@@ -43,11 +43,11 @@ function formatDateTime(date: string) {
 
 function getStatusClass(status: string) {
   if (status === 'CONFIRMED') {
-    return 'text-bg-success'
+    return 'text-bg-warning'
   }
 
   if (status === 'COMPLETED') {
-    return 'text-bg-secondary'
+    return 'text-bg-success'
   }
 
   if (status === 'CANCELLED') {
