@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import Sidebar from '../components/Sidebar.vue'
+import Sidebar from '../../components/Sidebar.vue'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL
 

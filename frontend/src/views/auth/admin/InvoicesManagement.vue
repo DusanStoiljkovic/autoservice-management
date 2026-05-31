@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
-import Sidebar from '../components/Sidebar.vue'
+import Sidebar from '../../components/Sidebar.vue'
 import { RouterLink } from 'vue-router'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL

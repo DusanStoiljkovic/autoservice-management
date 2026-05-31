@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
-import Sidebar from '../components/Sidebar.vue'
+import Sidebar from '../../components/Sidebar.vue'
 import type { Vehicle } from '@/types/vehicle.ts'
 import type { Customer } from '@/types/customer.ts'
 

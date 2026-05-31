@@ -1,6 +1,23 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import axios from 'axios'
+
+const user = ref(JSON.parse(localStorage.getItem('user') || '{}'))
+const role = computed(() => user.value.role)
+
+// Gde vodi "Dashboard" link, po roli
+const dashboardPath = computed(() => {
+  if (role.value === 'MECHANIC') return '/dashboard/mechanic'
+  if (role.value === 'RECEPTIONIST') return '/dashboard/receptionist'
+  if (role.value === 'MANAGER') return '/dashboard/manager'
+  return '/dashboard'
+})
+
+// Da li trenutna rola sme da vidi stavku
+function allowed(roles: string[]) {
+  return roles.includes(role.value)
+}
 
 function logout() {
   localStorage.removeItem('token')
@@ -14,63 +31,78 @@ function logout() {
 <template>
   <aside class="sidebar bg-body-tertiary border-end">
     <div class="sidebar-header px-3 py-4 border-bottom">
-      <RouterLink class="sidebar-brand text-decoration-none text-body fw-bold" to="/dashboard">
+      <RouterLink class="sidebar-brand text-decoration-none text-body fw-bold" :to="dashboardPath">
         AutoService
       </RouterLink>
 
-      <p class="text-body-secondary small mb-0 mt-1">
-        Panel za majstora
+      <p v-if="role" class="text-body-secondary small mb-0 mt-1">
+        {{ role }} panel
       </p>
     </div>
 
     <div class="sidebar-body p-3">
       <ul class="nav flex-column gap-1">
+        <!-- Dashboard - svi, ali vodi po roli -->
         <li class="nav-item">
-          <RouterLink class="nav-link d-flex align-items-center gap-2" to="/dashboard">
+          <RouterLink class="nav-link d-flex align-items-center gap-2" :to="dashboardPath">
             <i class="bi bi-speedometer2"></i>
             Dashboard
           </RouterLink>
         </li>
 
-        <li class="nav-item">
+        <!-- Klijenti - admin, menadžer, recepcioner -->
+        <li v-if="allowed(['ADMIN', 'MANAGER', 'RECEPTIONIST'])" class="nav-item">
           <RouterLink class="nav-link d-flex align-items-center gap-2" to="/dashboard/customers">
             <i class="bi bi-people"></i>
             Klijenti
           </RouterLink>
         </li>
 
-        <li class="nav-item">
+        <!-- Vozila - admin, menadžer, recepcioner -->
+        <li v-if="allowed(['ADMIN', 'MANAGER', 'RECEPTIONIST'])" class="nav-item">
           <RouterLink class="nav-link d-flex align-items-center gap-2" to="/dashboard/vehicles">
             <i class="bi bi-car-front"></i>
             Vozila
           </RouterLink>
         </li>
 
-        <li class="nav-item">
+        <!-- Termini - admin, menadžer, recepcioner -->
+        <li v-if="allowed(['ADMIN', 'MANAGER', 'RECEPTIONIST'])" class="nav-item">
           <RouterLink class="nav-link d-flex align-items-center gap-2" to="/dashboard/appointments">
             <i class="bi bi-calendar-event"></i>
             Termini
           </RouterLink>
         </li>
 
-        <li class="nav-item">
+        <!-- Usluge (cenovnik) - admin, menadžer -->
+        <li v-if="allowed(['ADMIN', 'MANAGER'])" class="nav-item">
           <RouterLink class="nav-link d-flex align-items-center gap-2" to="/dashboard/services">
             <i class="bi bi-tools"></i>
             Usluge
           </RouterLink>
         </li>
 
-        <li class="nav-item">
+        <!-- Radni nalozi - admin, menadžer, recepcioner (majstor ima svoj prikaz) -->
+        <li v-if="allowed(['ADMIN', 'MANAGER', 'RECEPTIONIST'])" class="nav-item">
           <RouterLink class="nav-link d-flex align-items-center gap-2" to="/dashboard/repair-orders">
             <i class="bi bi-clipboard-check"></i>
             Radni nalozi
           </RouterLink>
         </li>
 
-        <li class="nav-item">
+        <!-- Fakture - admin, menadžer, recepcioner -->
+        <li v-if="allowed(['ADMIN', 'MANAGER', 'RECEPTIONIST'])" class="nav-item">
           <RouterLink class="nav-link d-flex align-items-center gap-2" to="/dashboard/invoices">
             <i class="bi bi-receipt"></i>
             Fakture
+          </RouterLink>
+        </li>
+
+        <!-- Zaposleni - samo admin -->
+        <li v-if="allowed(['ADMIN'])" class="nav-item">
+          <RouterLink class="nav-link d-flex align-items-center gap-2" to="/dashboard/users/new">
+            <i class="bi bi-person-badge"></i>
+            Zaposleni
           </RouterLink>
         </li>
       </ul>

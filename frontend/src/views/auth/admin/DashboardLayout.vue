@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
-import Sidebar from '../components/Sidebar.vue'
+import Sidebar from '../../components/Sidebar.vue'
 import type { Customer } from '@/types/customer.ts'
 import type { Service } from '@/types/services.ts'
 

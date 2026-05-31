@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import Sidebar from '../components/Sidebar.vue'
+import Sidebar from '../../components/Sidebar.vue'
 
 type Theme = 'light' | 'dark' | 'system'
 

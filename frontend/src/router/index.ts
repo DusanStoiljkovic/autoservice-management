@@ -7,19 +7,22 @@ import AboutPage from '../views/customers/AboutPage.vue'
 import ContactPage from '../views/customers/ContactPage.vue'
 
 import LoginPage from '../views/auth/LoginPage.vue'
-import RegisterPage from '../views/auth/RegisterPage.vue'
-import DashboardLayout from '../views/auth/DashboardLayout.vue'
-import AppointmentDetailsLayout from '../views/auth/AppointmentDetailsLayout.vue'
-import CustomersManagement from '../views/auth/CustomersManagement.vue'
-import VehiclesManagement from '../views/auth/VehicleManagement.vue'
-import AppointmentsManagement from '../views/auth/AppointmentsManagement.vue'
-import ServicesManagement from '../views/auth/ServiceManagement.vue'
-import RepairOrdersManagement from '../views/auth/RepairsOrdersManagement.vue'
-import InvoicesManagement from '../views/auth/InvoicesManagement.vue'
-import SettingsPage from '../views/auth/SettingsPage.vue'
-import RepairOrderDetailsPage from '@/views/auth/RepairOrderDetailsPage.vue'
-import InvoiceCreatePage from '@/views/auth/InvoiceCreatePage.vue'
-import InvoiceDetailsPage from '@/views/auth/InvoiceDetailsPage.vue'
+import RegisterPage from '../views/auth/admin/RegisterPage.vue'
+import DashboardLayout from '../views/auth/admin/DashboardLayout.vue'
+import AppointmentDetailsLayout from '../views/auth/admin/AppointmentDetailsLayout.vue'
+import CustomersManagement from '../views/auth/admin/CustomersManagement.vue'
+import VehiclesManagement from '../views/auth/admin/VehicleManagement.vue'
+import AppointmentsManagement from '../views/auth/admin/AppointmentsManagement.vue'
+import ServicesManagement from '../views/auth/admin/ServiceManagement.vue'
+import RepairOrdersManagement from '../views/auth/admin/RepairsOrdersManagement.vue'
+import InvoicesManagement from '../views/auth/admin/InvoicesManagement.vue'
+import SettingsPage from '../views/auth/admin/SettingsPage.vue'
+import RepairOrderDetailsPage from '@/views/auth/admin/RepairOrderDetailsPage.vue'
+import InvoiceCreatePage from '@/views/auth/admin/InvoiceCreatePage.vue'
+import InvoiceDetailsPage from '@/views/auth/admin/InvoiceDetailsPage.vue'
+import MechanicDashboardLayout from '@/views/auth/mechanic/MechanicDashboardLayout.vue'
+import ReceptionDashboard from '@/views/auth/reception/ReceptionDashboard.vue'
+import MechanicOrderDetails from '@/views/auth/mechanic/MechanicOrderDetails.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -132,6 +135,24 @@ const router = createRouter({
       name: 'register',
       component: RegisterPage,
       meta: { requiresAuth: true }
+    },
+    { 
+      path: '/dashboard/receptionist', 
+      name: 'reception-dashboard', 
+      component: ReceptionDashboard, 
+      meta: { requiresAuth: true, role: 'RECEPTIONIST' } 
+    },
+    { 
+      path: '/dashboard/mechanic', 
+      name: 'mechanic-dashboard', 
+      component: MechanicDashboardLayout, 
+      meta: { requiresAuth: true, role: 'MECHANIC' } 
+    },
+    { 
+      path: '/dashboard/mechanic/orders/:id', 
+      name: 'mechanic-order', 
+      component: MechanicOrderDetails, 
+      meta: { requiresAuth: true, role: 'MECHANIC' } 
     },
     {
       path: '/:pathMatch(.*)*',

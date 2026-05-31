@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
-import Sidebar from '../components/Sidebar.vue'
+import Sidebar from '../../components/Sidebar.vue'
 
 const router = useRouter()
 const API_BASE_URL = import.meta.env.VITE_API_URL
