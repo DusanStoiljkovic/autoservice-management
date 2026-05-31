@@ -1,5 +1,14 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import axios from 'axios'
+
+function logout() {
+  localStorage.removeItem('token')
+  localStorage.removeItem('refreshToken')
+  localStorage.removeItem('user')
+  delete axios.defaults.headers.common['Authorization']
+  window.location.href = '/login'
+}
 </script>
 
 <template>
@@ -77,7 +86,7 @@ import { RouterLink } from 'vue-router'
         </li>
 
         <li class="nav-item">
-          <button class="nav-link logout-btn d-flex align-items-center gap-2 w-100">
+          <button class="nav-link logout-btn d-flex align-items-center gap-2 w-100" @click="logout">
             <i class="bi bi-box-arrow-right"></i>
             Odjavi se
           </button>

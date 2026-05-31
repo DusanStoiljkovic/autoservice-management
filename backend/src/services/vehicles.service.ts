@@ -51,6 +51,18 @@ export class VehicleService {
   }
 
   static async create(vehicleData: Partial<Vehicles>) {
+    const existingVehicle = await this.repo.findOne({
+      where: [
+        { make: vehicleData.make },
+        { model: vehicleData.model },
+        { licensePlate: vehicleData.licensePlate },
+      ]
+    })
+
+    if (existingVehicle) {
+      return existingVehicle
+    }
+    
     const vehicle = this.repo.create(vehicleData)
 
     return await this.repo.save(vehicle)

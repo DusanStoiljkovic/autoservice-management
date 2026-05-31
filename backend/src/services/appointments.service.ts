@@ -69,13 +69,17 @@ export class AppointmentService {
     })
   }
 
-  static async create(dto: CreateAppointmentDto) {
-    const scheduledAt = new Date(dto.scheduledAt)
+  static async create(appointmentData: Partial<Appointments>) {
+    if (appointmentData.scheduledAt == null) {
+      throw new Error("Invalid appointment date.")
+    }
+
+    const scheduledAt = new Date(appointmentData.scheduledAt as string | number | Date)
 
     if (Number.isNaN(scheduledAt.getTime())) {
       throw new Error("Invalid appointment date.")
     }
-
+    
     const existingAppointment = await this.repo.findOne({
       where: {
         scheduledAt,
@@ -90,26 +94,30 @@ export class AppointmentService {
       throw new Error("Appointment term is already taken.")
     }
 
-    if (!dto.serviceIds || dto.serviceIds.length === 0) {
+    const incomingServices = appointmentData.services ?? []
+
+    if (incomingServices.length === 0) {
       throw new Error("At least one service must be selected.")
     }
 
-    const services = await AppDataSource.getRepository("Service").findBy(
+    const serviceIds = incomingServices.map(s => s.id)
+
+    const services = await AppDataSource.getRepository("Services").findBy(
       {
-        id: In(dto.serviceIds),
+        id: In(serviceIds),
       }
     )
 
-    if (services.length !== dto.serviceIds.length) {
+    if (services.length !== incomingServices.length) {
       throw new Error("One or more selected services are invalid.")
     }
 
     const appointment = this.repo.create({
-      customerId: dto.customerId,
-      vehicleId: dto.vehicleId,
+      customerId: appointmentData.customerId,
+      vehicleId: appointmentData.vehicleId,
       scheduledAt,
       status: AppointmentStatus.SCHEDULED,
-      description: dto.problemDescription ?? dto.description ?? "",
+      description: appointmentData.description ?? appointmentData.description ?? "",
       services,
     })
 

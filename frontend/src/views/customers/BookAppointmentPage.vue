@@ -1,3 +1,207 @@
+<script setup lang="ts">
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import axios from 'axios'
+import type { Service } from '@/types/services'
+
+const API_URL = import.meta.env.VITE_API_URL
+
+const services = ref<Service[]>([])
+const appointments = ref<any[]>([])
+const servicesLoading = ref(false)
+const appointmentsLoading = ref(false)
+const submitting = ref(false)
+const errorMessage = ref('')
+const successMessage = ref('')
+
+const workingSlots = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00']
+
+const form = reactive({
+  firstName: '',
+  lastName: '',
+  phone: '',
+  email: '',
+  address: '',
+
+  make: '',
+  model: '',
+  productionYear: null as number | null,
+  licensePlate: '',
+  vin: '',
+  mileage: null as number | null,
+
+  serviceId: 0,
+  appointmentDate: '',
+  appointmentTime: '',
+  problemDescription: ''
+})
+
+const activeServices = computed(() => services.value.filter((service) => service.isActive === 1))
+
+const selectedService = computed(() =>
+  activeServices.value.find((service) => service.id === form.serviceId)
+)
+
+const vehiclePreview = computed(() => {
+  const name = `${form.make} ${form.model}`.trim()
+  return name || 'Vozilo nije uneto'
+})
+
+const appointmentPreview = computed(() => {
+  if (!form.appointmentDate || !form.appointmentTime) {
+    return 'Vreme nije izabrano'
+  }
+  return `${form.appointmentDate} u ${form.appointmentTime}`
+})
+
+// Vremena koja su za izabrani datum vec zauzeta (zakazani ili potvrdjeni termini)
+const takenTimes = computed(() => {
+  if (!form.appointmentDate) {
+    return []
+  }
+
+  return appointments.value
+    .filter((a) => a.status === 'SCHEDULED' || a.status === 'CONFIRMED')
+    .map((a) => new Date(a.scheduledAt))
+    .filter((date) => {
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      return `${date.getFullYear()}-${month}-${day}` === form.appointmentDate
+    })
+    .map((date) => {
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      return `${hours}:${minutes}`
+    })
+})
+
+async function loadServices() {
+  try {
+    servicesLoading.value = true
+    const response = await axios.get(`${API_URL}/services/all`)
+    services.value = response.data
+  } catch (error) {
+    console.error(error)
+    errorMessage.value = 'Usluge trenutno ne mogu da se učitaju. Pokušajte ponovo kasnije.'
+  } finally {
+    servicesLoading.value = false
+  }
+}
+
+async function loadAppointments() {
+  try {
+    appointmentsLoading.value = true
+    const response = await axios.get(`${API_URL}/appointments/all`)
+    appointments.value = response.data
+  } catch (error) {
+    console.error(error)
+    errorMessage.value = 'Termini trenutno ne mogu da se učitaju. Pokušajte ponovo kasnije.'
+  } finally {
+    appointmentsLoading.value = false
+  }
+}
+
+async function submitAppointment() {
+  errorMessage.value = ''
+  successMessage.value = ''
+
+  if (!selectedService.value) {
+    errorMessage.value = 'Molimo vas da izaberete uslugu.'
+    return
+  }
+
+  if (!form.appointmentTime) {
+    errorMessage.value = 'Molimo vas da izaberete slobodan termin.'
+    return
+  }
+
+  if (takenTimes.value.includes(form.appointmentTime)) {
+    errorMessage.value = 'Ovaj termin je već zauzet.'
+    return
+  }
+
+  try {
+    submitting.value = true
+
+    const { data: customer } = await axios.post(`${API_URL}/customers/create`, {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      phone: form.phone,
+      email: form.email || null,
+      address: form.address || null,
+      notes: null
+    })
+
+    const { data: vehicle } = await axios.post(`${API_URL}/vehicles/create`, {
+      customerId: customer.id,
+      make: form.make,
+      model: form.model,
+      productionYear: form.productionYear || null,
+      licensePlate: form.licensePlate || null,
+      vin: form.vin || null,
+      mileage: form.mileage || 0
+    })
+
+    await axios.post(`${API_URL}/appointments/create`, {
+      customerId: customer.id,
+      vehicleId: vehicle.id,
+      scheduledAt: `${form.appointmentDate}T${form.appointmentTime}:00`,
+      services: [{ id: form.serviceId }],
+      description: form.problemDescription || null
+    })
+
+    successMessage.value = 'Zahtev za termin je uspešno kreiran.'
+    await loadAppointments()
+    resetForm()
+  } catch (error: any) {
+    console.error(error)
+    errorMessage.value =
+      error.response?.data?.message || 'Termin nije moguće kreirati. Pokušajte ponovo.'
+  } finally {
+    submitting.value = false
+  }
+}
+
+function resetForm() {
+  form.firstName = ''
+  form.lastName = ''
+  form.phone = ''
+  form.email = ''
+  form.address = ''
+  form.make = ''
+  form.model = ''
+  form.productionYear = null
+  form.licensePlate = ''
+  form.vin = ''
+  form.mileage = null
+  form.serviceId = 0
+  form.appointmentDate = ''
+  form.appointmentTime = ''
+  form.problemDescription = ''
+}
+
+function formatPrice(price: string | number) {
+  const numericPrice = Number(price)
+  if (Number.isNaN(numericPrice)) {
+    return `${price} RSD`
+  }
+  return new Intl.NumberFormat('sr-RS', {
+    style: 'currency',
+    currency: 'RSD',
+    minimumFractionDigits: 0
+  }).format(numericPrice)
+}
+
+// Kad korisnik promeni datum, prethodno izabrano vreme vise ne vazi
+watch(() => form.appointmentDate, () => {
+  form.appointmentTime = ''
+})
+
+onMounted(() => {
+  loadServices()
+  loadAppointments()
+})
+</script>
+
 <template>
   <main class="book-appointment-page bg-body-tertiary text-body">
     <section id="hero" class="booking-hero text-white">
@@ -310,11 +514,11 @@
                           type="button"
                           class="btn time-slot-btn"
                           :class="{
-                            'btn-primary': form.appointmentTime === time && !isSlotOccupied(time),
-                            'btn-outline-primary': form.appointmentTime !== time && !isSlotOccupied(time),
-                            'btn-outline-secondary disabled text-decoration-line-through': isSlotOccupied(time)
+                            'btn-primary': form.appointmentTime === time && !takenTimes.includes(time),
+                            'btn-outline-primary': form.appointmentTime !== time && !takenTimes.includes(time),
+                            'btn-outline-secondary disabled text-decoration-line-through': takenTimes.includes(time)
                           }"
-                          :disabled="isSlotOccupied(time)"
+                          :disabled="takenTimes.includes(time)"
                           @click="form.appointmentTime = time"
                         >
                           {{ time }}
@@ -322,7 +526,7 @@
                       </div>
 
                       <div
-                        v-if="form.appointmentDate && occupiedTimesForSelectedDate.length > 0"
+                        v-if="form.appointmentDate && takenTimes.length > 0"
                         class="form-text mt-2"
                       >
                         Precrtani termini su već zauzeti.
@@ -368,321 +572,9 @@
   </main>
 </template>
 
-<script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
-import type { Service } from '@/types/services'
- 
-interface CustomerResponse {
-  id: number
-}
-
-interface VehicleResponse {
-  id: number
-}
-
-interface Appointment {
-  id: number
-  scheduledAt: string
-  status: string
-}
-
-const API_URL = import.meta.env.VITE_API_URL
-
-const services = ref<Service[]>([])
-const servicesLoading = ref(false)
-const submitting = ref(false)
-const errorMessage = ref('')
-const successMessage = ref('')
-
-const appointments = ref<Appointment[]>([])
-const appointmentsLoading = ref(false)
-
-const workingSlots = [
-  '08:00',
-  '09:00',
-  '10:00',
-  '11:00',
-  '12:00',
-  '13:00',
-  '14:00',
-  '15:00'
-]
-
-const form = reactive({
-  firstName: '',
-  lastName: '',
-  phone: '',
-  email: '',
-  address: '',
-
-  make: '',
-  model: '',
-  productionYear: null as number | null,
-  licensePlate: '',
-  vin: '',
-  mileage: null as number | null,
-
-  serviceId: 0,
-  appointmentDate: '',
-  appointmentTime: '',
-  problemDescription: ''
-})
-
-const activeServices = computed(() => {
-  return services.value.filter((service) => {
-    return service.isActive === 1
-  })
-})
-
-const selectedService = computed(() => {
-  return activeServices.value.find((service) => service.id === form.serviceId)
-})
-
-const vehiclePreview = computed(() => {
-  if (!form.make && !form.model) {
-    return 'Vozilo nije uneto'
-  }
-
-  return `${form.make} ${form.model}`.trim()
-})
-
-const appointmentPreview = computed(() => {
-  if (!form.appointmentDate || !form.appointmentTime) {
-    return 'Vreme nije izabrano'
-  }
-
-  return `${form.appointmentDate} u ${form.appointmentTime}`
-})
-
-const occupiedTimesForSelectedDate = computed(() => {
-  if (!form.appointmentDate) {
-    return []
-  }
-
-  return appointments.value
-    .filter((appointment) => {
-      const appointmentDate = getAppointmentDate(appointment.scheduledAt)
-
-      const isSameDate = appointmentDate === form.appointmentDate
-
-      const isBlockingStatus =
-        appointment.status === 'SCHEDULED' ||
-        appointment.status === 'CONFIRMED'
-
-      return isSameDate && isBlockingStatus
-    })
-    .map((appointment) => {
-      return getAppointmentTime(appointment.scheduledAt)
-    })
-})
-
-async function loadServices() {
-  try {
-    servicesLoading.value = true
-
-    const response = await fetch(`${API_URL}/services/all`)
-
-    if (!response.ok) {
-      throw new Error('Neuspešno učitavanje usluga')
-    }
-
-    services.value = await response.json()
-  } catch (error) {
-    console.error(error)
-    errorMessage.value = 'Usluge trenutno ne mogu da se učitaju. Pokušajte ponovo kasnije.'
-  } finally {
-    servicesLoading.value = false
-  }
-}
-
-async function loadAppointments() {
-  try {
-    appointmentsLoading.value = true
-
-    const response = await fetch(`${API_URL}/appointments/all`)
-
-    if (!response.ok) {
-      throw new Error('Neuspešno učitavanje termina')
-    }
-
-    appointments.value = await response.json()
-  } catch (error) {
-    console.error(error)
-    errorMessage.value = 'Termini trenutno ne mogu da se učitaju. Pokušajte ponovo kasnije.'
-  } finally {
-    appointmentsLoading.value = false
-  }
-}
-
-async function submitAppointment() {
-  try {
-    submitting.value = true
-    errorMessage.value = ''
-    successMessage.value = ''
-
-    if (!API_URL) {
-      throw new Error('VITE_API_URL nedostaje u frontend .env fajlu.')
-    }
-
-    if (!selectedService.value) {
-      throw new Error('Molimo vas da izaberete uslugu.')
-    }
-
-    if (!form.appointmentTime) {
-      throw new Error('Molimo vas da izaberete slobodan termin.')
-    }
-
-    if (isSlotOccupied(form.appointmentTime)) {
-      throw new Error('Ovaj termin je već zauzet.')
-    }
-
-    const customer = await Post<CustomerResponse>('/customers/create', {
-      firstName: form.firstName,
-      lastName: form.lastName,
-      phone: form.phone,
-      email: form.email || null,
-      address: form.address || null,
-      notes: null
-    })
-
-    const vehicle = await Post<VehicleResponse>('/vehicles/create', {
-      customerId: customer.id,
-      make: form.make,
-      model: form.model,
-      productionYear: form.productionYear || null,
-      licensePlate: form.licensePlate || null,
-      vin: form.vin || null,
-      mileage: form.mileage || 0
-    })
-
-    const scheduledAt = `${form.appointmentDate}T${form.appointmentTime}:00`
-
-    await Post('/appointments/create', {
-      customerId: customer.id,
-      vehicleId: vehicle.id,
-      scheduledAt,
-      serviceType: selectedService.value.name,
-      problemDescription: form.problemDescription || null,
-    })
-
-    successMessage.value = 'Zahtev za termin je uspešno kreiran.'
-
-    await loadAppointments()
-
-    resetForm()
-  } catch (error) {
-    console.error(error)
-
-    if (error instanceof Error) {
-      errorMessage.value = error.message
-      return
-    }
-
-    errorMessage.value = 'Termin nije moguće kreirati. Pokušajte ponovo.'
-  } finally {
-    submitting.value = false
-  }
-}
-
-async function Post<T = unknown>(path: string, body: unknown): Promise<T> {
-  const response = await fetch(`${API_URL}${path}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  })
-
-  const data = await response.json().catch(() => null)
-
-  if (!response.ok) {
-    throw new Error(data?.message || 'Zahtev nije uspešno obrađen.')
-  }
-
-  return data as T
-}
-
-function isSlotOccupied(time: string) {
-  return occupiedTimesForSelectedDate.value.includes(time)
-}
-
-function getAppointmentDate(scheduledAt: string) {
-  const date = new Date(scheduledAt)
-
-  if (Number.isNaN(date.getTime())) {
-    return scheduledAt.slice(0, 10)
-  }
-
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-
-  return `${year}-${month}-${day}`
-}
-
-function getAppointmentTime(scheduledAt: string) {
-  const date = new Date(scheduledAt)
-
-  if (Number.isNaN(date.getTime())) {
-    return scheduledAt.slice(11, 16)
-  }
-
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-
-  return `${hours}:${minutes}`
-}
-
-function resetForm() {
-  form.firstName = ''
-  form.lastName = ''
-  form.phone = ''
-  form.email = ''
-  form.address = ''
-
-  form.make = ''
-  form.model = ''
-  form.productionYear = null
-  form.licensePlate = ''
-  form.vin = ''
-  form.mileage = null
-
-  form.serviceId = 0
-  form.appointmentDate = ''
-  form.appointmentTime = ''
-  form.problemDescription = ''
-}
-
-function formatPrice(price: string | number) {
-  const numericPrice = Number(price)
-
-  if (Number.isNaN(numericPrice)) {
-    return `${price} RSD`
-  }
-
-  return new Intl.NumberFormat('sr-RS', {
-    style: 'currency',
-    currency: 'RSD',
-    minimumFractionDigits: 0
-  }).format(numericPrice)
-}
-
-watch(
-  () => form.appointmentDate,
-  () => {
-    form.appointmentTime = ''
-  }
-)
-
-onMounted(() => {
-  loadServices()
-  loadAppointments()
-})
-</script>
-
 <style scoped>
 #hero {
-  background-image: 
+  background-image:
     linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),
     url('/images/customers/landingHero3.jpg');
   background-size: cover;

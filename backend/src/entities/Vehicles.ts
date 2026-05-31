@@ -14,8 +14,6 @@ import type { Relation } from "typeorm";
 
 
 @Index("idx_vehicles_customer_id", ["customerId"], {})
-@Index("idx_vehicles_license_plate", ["licensePlate"], {})
-@Index("license_plate", ["licensePlate"], { unique: true })
 @Index("vin", ["vin"], { unique: true })
 @Entity("vehicles", { schema: "auto_service_management" })
 export class Vehicles {
@@ -40,7 +38,7 @@ export class Vehicles {
     unique: true,
     length: 30,
   })
-  licensePlate: string | null;
+  licensePlate: string;
 
   @Column("varchar", { name: "vin", nullable: true, unique: true, length: 50 })
   vin: string | null;

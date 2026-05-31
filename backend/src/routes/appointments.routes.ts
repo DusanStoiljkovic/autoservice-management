@@ -6,7 +6,7 @@ import { authorize } from "../middleware/authorize"
 
 export const AppointmentRoute = Router()
 
-AppointmentRoute.get("/all", authenticate, async (req, res) => {
+AppointmentRoute.get("/all", async (req, res) => {
   // query -> status, dateFrom, dateTo, customerId, vehicleId
   const query = req.query
   await defineRequest(res, async () => {
@@ -14,7 +14,7 @@ AppointmentRoute.get("/all", authenticate, async (req, res) => {
   })
 })
 
-AppointmentRoute.get("/customer/:customerId", authenticate, authorize("admin", "mechanic"), async (req, res) => {
+AppointmentRoute.get("/customer/:customerId", async (req, res) => {
   const customerId = Number(req.params.customerId)
 
   await defineRequest(res, async () => {
@@ -22,7 +22,7 @@ AppointmentRoute.get("/customer/:customerId", authenticate, authorize("admin", "
   })
 })
 
-AppointmentRoute.get("/:id", authenticate, async (req, res) => {
+AppointmentRoute.get("/:id", async (req, res) => {
   const id = Number(req.params.id)
 
   await defineRequest(res, async () => {
@@ -30,13 +30,13 @@ AppointmentRoute.get("/:id", authenticate, async (req, res) => {
   })
 })
 
-AppointmentRoute.post("/create", authenticate, async (req, res) => {
+AppointmentRoute.post("/create", async (req, res) => {
   await defineRequest(res, async () => {
     return await AppointmentService.create(req.body)
   })
 })
 
-AppointmentRoute.patch("/:id", authenticate, async (req, res) => {
+AppointmentRoute.patch("/:id", async (req, res) => {
   const id = Number(req.params.id)
 
   await defineRequest(res, async () => {
@@ -44,7 +44,7 @@ AppointmentRoute.patch("/:id", authenticate, async (req, res) => {
   })
 })
 
-AppointmentRoute.patch("/:id/status", authenticate, async (req, res) => {
+AppointmentRoute.patch("/:id/status", async (req, res) => {
   const id = Number(req.params.id)
   const { status } = req.body
 
@@ -53,7 +53,7 @@ AppointmentRoute.patch("/:id/status", authenticate, async (req, res) => {
   })
 })
 
-AppointmentRoute.delete("/:id", authenticate, async (req, res) => {
+AppointmentRoute.delete("/:id", async (req, res) => {
   const id = Number(req.params.id)
 
   await defineRequest(res, async () => {
