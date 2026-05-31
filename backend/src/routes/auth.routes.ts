@@ -1,9 +1,13 @@
 import { Router, Request, Response } from "express"
 import { AuthService } from "../services/auth.service"
+import { authenticate } from "../middleware/authenticate"
+import { authorize } from "../middleware/authorize"
+import { UsersRole } from "../entities/Users"
+import { defineRequest } from "../utils"
 
 const AuthRoute = Router()
 
-AuthRoute.post("/register", async (req: Request, res: Response) => {
+AuthRoute.post("/register", authenticate, authorize(UsersRole.ADMIN), async (req: Request, res: Response) => {
   try {
     const result = await AuthService.register(req.body)
 
@@ -27,7 +31,7 @@ AuthRoute.post("/login", async (req: Request, res: Response) => {
   }
 })
 
-AuthRoute.post("/refresh", async (req: Request, res: Response) => {
+AuthRoute.post("/refresh", authenticate, async (req: Request, res: Response) => {
   try {
     const { refreshToken } = req.body
 
@@ -46,7 +50,7 @@ AuthRoute.post("/refresh", async (req: Request, res: Response) => {
   }
 })
 
-AuthRoute.get("/profile", AuthService.authenticate, async (req: Request, res: Response) => {
+AuthRoute.get("/profile", authenticate, AuthService.authenticate, async (req: Request, res: Response) => {
   try {
     const user = (req as any).user
     const profile = await AuthService.profile(user.id)

@@ -1,4 +1,43 @@
 <script setup lang="ts">
+import axios from 'axios'
+import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+
+const router = useRouter()
+const API_BASE_URL = import.meta.env.VITE_API_URL
+
+const email = ref('')
+const password = ref('')
+const errorMessage = ref('')
+const loading = ref(false)
+
+async function handleLogin() {
+  errorMessage.value = ''
+  loading.value = true
+
+  try {
+    const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+      email: email.value.trim(),
+      password: password.value
+    })
+
+    const { user, accessToken, refreshToken } = response.data
+
+    localStorage.setItem('user', JSON.stringify(user))
+    localStorage.setItem('token', accessToken)
+    localStorage.setItem('refreshToken', refreshToken)
+
+    axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
+
+    router.push('/dashboard')
+  } catch (error) {
+    errorMessage.value = 'Neispravna email adresa ili lozinka.'
+  } finally {
+    loading.value = false
+  }
+}
+
+
 
 </script>
 
@@ -25,6 +64,7 @@
             type="email"
             class="form-control"
             id="floatingInput"
+            v-model="email"
           >
           <label for="floatingInput">Email adresa</label>
         </div>
@@ -34,6 +74,7 @@
             type="password"
             class="form-control"
             id="floatingPassword"
+            v-model="password"
           >
           <label for="floatingPassword">Lozinka</label>
         </div>
@@ -48,9 +89,13 @@
           <label class="form-check-label" for="checkDefault">
             Zapamti me
           </label>
+
+          <label class="error-message text-danger mt-3">
+            {{ errorMessage }}
+          </label>
         </div>
 
-        <button class="btn btn-primary w-100 py-2" type="submit">
+        <button class="btn btn-primary w-100 py-2" type="submit" @click="handleLogin" :disabled="loading">
           Prijavi se
         </button>
 

@@ -22,29 +22,3 @@ export async function defineRequest(res: Response, callback: Function) {
         console.log(error)
     }
 }
-
-// export async function writeJSON<T>(
-//     res: Response, 
-//     callback: (...args: any[]) => Promise<T> | T,
-//     ...args: any[]
-// ) {
-//     try {
-//         const data = await callback(...args)
-
-//         return res.status(200).json({
-//             success: true,
-//             data
-//         })
-//     } catch (error: any) {
-//         console.log("API ERROR: ", error)
-
-//         return res.status(500).json({
-//             success: false,
-//             message: error.message || "Failed to load"
-//         })
-//     }
-// }
-
-// export function parseParam(req: Request, param: string) {
-//     return req.params[param]
-// }

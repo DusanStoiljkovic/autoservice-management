@@ -55,70 +55,90 @@ const router = createRouter({
       component: LoginPage
     },
     {
-      path: '/register',
-      name: 'register',
-      component: RegisterPage
-    },
-    {
       path: '/dashboard',
       name: 'dashboard',
-      component: DashboardLayout
+      component: DashboardLayout,
+      meta: { requiresAuth: true }
     },
     {
       path: '/dashboard/customers',
       name: 'customers-management',
-      component: CustomersManagement
+      component: CustomersManagement,
+      meta: { requiresAuth: true }
     },
     {
       path: '/dashboard/vehicles',
       name: 'vehicles-management',
-      component: VehiclesManagement
+      component: VehiclesManagement,
+      meta: { requiresAuth: true }
     },
     {
       path: '/dashboard/appointments',
       name: 'appointments',
-      component: AppointmentsManagement
+      component: AppointmentsManagement,
+      meta: { requiresAuth: true }
     },
     {
       path: '/dashboard/appointments/:id',
       name: 'appointment-details',
-      component: AppointmentDetailsLayout
+      component: AppointmentDetailsLayout,
+      meta: { requiresAuth: true }
     },
     {
       path: '/dashboard/services',
       name: 'services-management',
-      component: ServicesManagement
+      component: ServicesManagement,
+      meta: { requiresAuth: true }
     },
     {
       path: '/dashboard/repair-orders',
       name: 'repair-orders-management',
-      component: RepairOrdersManagement
+      component: RepairOrdersManagement,
+      meta: { requiresAuth: true }
     },
     {
       path: '/dashboard/repair-orders/:id',
       name: 'repair-orders-details',
-      component: RepairOrderDetailsPage
+      component: RepairOrderDetailsPage,
+      meta: { requiresAuth: true }
     },
     {
       path: '/dashboard/invoices',
       name: 'invoices-management',
-      component: InvoicesManagement
+      component: InvoicesManagement,
+      meta: { requiresAuth: true }
     },
     { 
       path: '/dashboard/invoices/new', 
       name: 'invoice-create', 
-      component: InvoiceCreatePage 
+      component: InvoiceCreatePage,
+      meta: { requiresAuth: true }
     },
     {
       path: '/dashboard/settings',
       name: 'settings-management',
-      component: SettingsPage
+      component: SettingsPage,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/dashboard/register',
+      name: 'register',
+      component: RegisterPage,
+      meta: { requiresAuth: true }
     },
     {
       path: '/:pathMatch(.*)*',
       redirect: '/'
     }
   ]
+})
+
+router.beforeEach((to) => {
+    const token = localStorage.getItem('token')
+    
+    if(to.meta.requiresAuth && !token) {
+      return '/login'
+    }
 })
 
 export default router

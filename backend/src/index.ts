@@ -28,7 +28,7 @@ app.get('/api/health', (req, res) => {
 })
 
 app.use('/api/auth', AuthRoute)
-app.use("/api/users", UserRoute)
+app.use('/api/users', UserRoute)
 app.use('/api/customers', CustomerRoute)
 app.use('/api/vehicles', VehicleRoute)
 app.use('/api/appointments', AppointmentRoute)

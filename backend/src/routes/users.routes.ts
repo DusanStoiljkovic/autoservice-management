@@ -1,9 +1,19 @@
 import { Router, Request, Response } from "express"
 import { UserService } from "../services/user.service"
+import { UsersRole } from "../entities/Users"
+import { defineRequest } from "../utils"
+import { authenticate } from "../middleware/authenticate"
+import { authorize } from "../middleware/authorize"
 
 export const UserRoute = Router()
 
-UserRoute.get("/all", async (req: Request, res: Response) => {
+UserRoute.get('/roles', authenticate, authorize(UsersRole.ADMIN), async (req: Request, res: Response) => {
+  defineRequest(res, async () => {
+    return Object.values(UsersRole)
+  })
+})
+
+UserRoute.get("/all", authenticate, authorize(UsersRole.ADMIN), async (req: Request, res: Response) => {
   try {
     const users = await UserService.getAll(req.query)
     res.json(users)

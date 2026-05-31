@@ -1,9 +1,10 @@
 import { Router, Request, Response } from "express"
 import { InvoiceService } from "../services/invoices.service"
+import { authenticate } from "../middleware/authenticate"
 
 const InvoiceRoute = Router()
 
-InvoiceRoute.get("/all", async (req: Request, res: Response) => {
+InvoiceRoute.get("/all", authenticate, async (req: Request, res: Response) => {
   try {
     const invoices = await InvoiceService.getAll()
 
