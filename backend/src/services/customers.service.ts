@@ -27,6 +27,16 @@ export class CustomerService {
   }
 
   static async create(customerData: Partial<Customers>) {
+    const existingCustomer = await this.repo.findOne({
+      where: {
+        phone: customerData.phone,
+      }
+    })
+
+    if (existingCustomer) {
+      return existingCustomer
+    }
+
     const customer = this.repo.create(customerData)
 
     return await this.repo.save(customer)

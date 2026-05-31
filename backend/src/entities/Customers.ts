@@ -22,7 +22,7 @@ export class Customers {
   @Column("varchar", { name: "last_name", length: 100 })
   lastName: string;
 
-  @Column("varchar", { name: "phone", length: 30 })
+  @Column("varchar", { name: "phone", length: 30, unique: true })
   phone: string;
 
   @Column("varchar", { name: "email", nullable: true, length: 150 })
