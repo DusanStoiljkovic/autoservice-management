@@ -23,6 +23,7 @@ import InvoiceDetailsPage from '@/views/auth/admin/InvoiceDetailsPage.vue'
 import MechanicDashboardLayout from '@/views/auth/mechanic/MechanicDashboardLayout.vue'
 import ReceptionDashboard from '@/views/auth/reception/ReceptionDashboard.vue'
 import MechanicOrderDetails from '@/views/auth/mechanic/MechanicOrderDetails.vue'
+import EmployeesManagement from '@/views/auth/admin/EmployeesManagement.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -153,6 +154,12 @@ const router = createRouter({
       name: 'mechanic-order', 
       component: MechanicOrderDetails, 
       meta: { requiresAuth: true, role: 'MECHANIC' } 
+    },
+    {
+      path: '/dashboard/users',
+      name: 'employees-management',
+      component: EmployeesManagement,
+      meta: { requiresAuth: true, role: "ADMIN"}
     },
     {
       path: '/:pathMatch(.*)*',

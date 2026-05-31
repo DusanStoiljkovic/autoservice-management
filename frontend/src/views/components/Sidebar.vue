@@ -100,7 +100,7 @@ function logout() {
 
         <!-- Zaposleni - samo admin -->
         <li v-if="allowed(['ADMIN'])" class="nav-item">
-          <RouterLink class="nav-link d-flex align-items-center gap-2" to="/dashboard/users/new">
+          <RouterLink class="nav-link d-flex align-items-center gap-2" to="/dashboard/users">
             <i class="bi bi-person-badge"></i>
             Zaposleni
           </RouterLink>
