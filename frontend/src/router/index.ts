@@ -62,67 +62,67 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: DashboardLayout,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, role: 'ADMIN'}
     },
     {
       path: '/dashboard/customers',
       name: 'customers-management',
       component: CustomersManagement,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, role: ['ADMIN', 'RECEPTIONIST']}
     },
     {
       path: '/dashboard/vehicles',
       name: 'vehicles-management',
       component: VehiclesManagement,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, role: ['ADMIN', 'RECEPTIONIST']}
     },
     {
       path: '/dashboard/appointments',
       name: 'appointments',
       component: AppointmentsManagement,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, role: ['ADMIN', 'RECEPTIONIST']}
     },
     {
       path: '/dashboard/appointments/:id',
       name: 'appointment-details',
       component: AppointmentDetailsLayout,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, role: ['ADMIN', 'RECEPTIONIST']}
     },
     {
       path: '/dashboard/services',
       name: 'services-management',
       component: ServicesManagement,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, role: ['ADMIN', 'RECEPTIONIST']}
     },
     {
       path: '/dashboard/repair-orders',
       name: 'repair-orders-management',
       component: RepairOrdersManagement,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, role: ['ADMIN', 'RECEPTIONIST']}
     },
     {
       path: '/dashboard/repair-orders/:id',
       name: 'repair-orders-details',
       component: RepairOrderDetailsPage,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, role: ['ADMIN', 'MECHANIC']}
     },
     {
       path: '/dashboard/invoices',
       name: 'invoices-management',
       component: InvoicesManagement,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, role: ['ADMIN', 'RECEPTIONIST']}
     },
     { 
       path: '/dashboard/invoices/new', 
       name: 'invoice-create', 
       component: InvoiceCreatePage,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, role: ['ADMIN', 'RECEPTIONIST']}
     },
     {
       path: '/dashboard/invoices/:id',
       name: 'invoice-details',
       component: InvoiceDetailsPage,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, role: ['ADMIN', 'RECEPTIONIST']}
     },
     {
       path: '/dashboard/settings',
@@ -134,7 +134,7 @@ const router = createRouter({
       path: '/dashboard/register',
       name: 'register',
       component: RegisterPage,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, role: ['ADMIN', 'RECEPTIONIST'] }
     },
     { 
       path: '/dashboard/receptionist', 
@@ -162,11 +162,18 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-    const token = localStorage.getItem('token')
-    
-    if(to.meta.requiresAuth && !token) {
-      return '/login'
-    }
+  const token = localStorage.getItem('token')
+  const user = JSON.parse(localStorage.getItem('user') || 'null')
+
+  if (to.meta.requiresAuth && !token) {
+    return '/login'
+  }
+
+  if (to.meta.role && !(to.meta.role as string[]).includes(user?.role)) {
+    if (user?.role === 'MECHANIC') return '/dashboard/mechanic'
+    if (user?.role === 'RECEPTIONIST') return '/dashboard/receptionist'
+    return '/dashboard'
+  }
 })
 
 export default router
