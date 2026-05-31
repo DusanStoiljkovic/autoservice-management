@@ -65,6 +65,13 @@ export class OrderService {
 
   static async editPartial(id: number, request: any) {
     const order = await this.getById(id)
+    if(request.mechanicId !== undefined) {
+      order.mechanic = request.mechanicId ? ({ id: request.mechanicId} as any)
+      : null
+      order.mechanicId = request.mechanicId
+      delete request.mechanicId
+    }
+
     Object.assign(order, request)
     return await this.repo.save(order)
   }

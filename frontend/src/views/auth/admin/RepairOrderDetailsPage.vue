@@ -178,7 +178,7 @@ async function assignMechanic(mechanic: any) {
   }
 
   try {
-    await axios.put(`${API_BASE_URL}/repair-orders/${order.value.id}`, {
+    await axios.patch(`${API_BASE_URL}/repair-orders/${order.value.id}`, {
       mechanicId: mechanic.id
     })
 

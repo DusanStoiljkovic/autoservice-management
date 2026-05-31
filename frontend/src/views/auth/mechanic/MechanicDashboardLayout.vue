@@ -29,7 +29,7 @@ const myOrders = computed(() => {
 })
 
 const activeOrders = computed(() =>
-  myOrders.value.filter((order) => order.status === 'OPEN' || order.status === 'IN_PROGRESS')
+  myOrders.value.filter((order) => order.status === 'IN_PROGRESS')
 )
 
 const completedOrders = computed(() =>
